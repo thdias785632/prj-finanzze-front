@@ -1,0 +1,20 @@
+<div class="navbar">
+  <div class="menu-icon" (click)="toggleMenu()">
+    <mat-icon aria-hidden="false" aria-label="Menu icon" fontIcon="menu"></mat-icon>
+    
+    <div class="side-menu" [class.open]="menuOpen">
+      <a *ngFor="let route of routes" [routerLink]="route.path">{{ route.label }}</a>
+    </div>
+  </div>
+
+  <div class="header">{{ header }}</div>
+  
+  <div class="user-icon">
+    <mat-icon aria-hidden="false" aria-label="User icon" fontIcon="person"></mat-icon>
+
+    <div class="dropdown-menu">
+      <a>Perfil</a>
+      <a (click)="logout()">Logout</a>
+    </div>
+  </div>
+</div>

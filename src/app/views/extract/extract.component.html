@@ -1,0 +1,336 @@
+<app-navbar [header]="'Extrato'"></app-navbar>
+
+<app-notification></app-notification>
+
+<app-loader [isLoading]="isLoading"></app-loader>
+
+<div class="container">
+    <section>
+        <div class="extract">
+            <div class="send-extract">
+                <button (click)="sendExtract()">Enviar Extrato <mat-icon>mail</mat-icon></button>
+            </div>
+            <div *ngIf="userExtract">
+                <div class="extract-item revenues">
+                    <div class="header">
+                        <h2>Receitas do mês</h2>
+                
+                        <mat-icon (click)="toggleOpenRevenueModal()">add</mat-icon>
+                    </div>
+                    
+                    <div *ngFor="let revenue of userExtract.revenues" class="revenue-item">
+                        <p>R$ {{ revenue.value | number: '1.2-2' }}</p>
+                        <h2>{{revenue.name}}</h2>
+                        <mat-icon (click)="toggleRevenueDeleteModal(revenue)">delete</mat-icon>
+                    </div>
+
+                    <hr/>
+                
+                    <div class="balance">
+                        <h2>Total</h2>
+                        <p>R$ {{ userExtract.totalRevenues | number: '1.2-2' }}</p>
+                    </div>
+                </div>
+
+                <div class="extract-item expenses">
+                    <div class="header">
+                        <h2>Despesas do mês</h2>
+
+                        <mat-icon (click)="toggleOpenExpenssesModal()">add</mat-icon>
+                    </div>
+                    <div *ngFor="let expense of userExtract.fixedExpensess" class="expenses-item">
+                        <p>R$ {{ expense.value | number: '1.2-2' }}</p>
+                        <h2>{{expense.name}}</h2>
+                        <mat-icon (click)="toggleExpenssesDeleteModal(expense)">delete</mat-icon>
+                    </div>
+
+                    <div class="expenses-item">
+                        <p>R$ {{ userExtract.totalCardExpensess | number: '1.2-2' }}</p>
+                        <h2>Cartão de Crédito</h2>
+                        <mat-icon (click)="showCardExtractModal = true">visibility</mat-icon>
+                    </div>
+
+                    <hr/>
+                
+                    <div class="balance">
+                        <h2>Total</h2>
+                        <p>R$ {{ userExtract.totalExpensess | number: '1.2-2' }}</p>
+                    </div>
+                </div>
+
+                <div class="extract-item balance-item">
+                    <div class="balance">
+                        <h2>Saldo</h2>
+                        <p>R$ {{ userExtract.totalRevenues - userExtract.totalExpensess | number: '1.2-2' }}</p>
+                    </div>
+                </div>
+
+                <div class="extract-item chart-extract" *ngIf="categoriesGrouped">
+                    <h1>
+                        Categorias
+                    </h1>
+
+                    <div class="chart-extract__item">
+                        <app-dashboard-chart [data]="categoriesGrouped"></app-dashboard-chart>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<div class="modal" *ngIf="showRevenueModal">
+    <div class="modal-content">
+        <h2>Adicionar Receita</h2>
+        <form [formGroup]="revenueForm" (ngSubmit)="onAddRevenue()">
+            <mat-form-field appearance="outline">
+                <mat-label>Data de Referência</mat-label>
+                <input matInput type="date" formControlName="referenceDate" name="date">
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+                <mat-label>Receita</mat-label>
+                <input matInput type="text" formControlName="name" name="name">
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+                <mat-label>Valor</mat-label>
+                <input matInput type="number" formControlName="value" name="value">
+            </mat-form-field>
+            
+            <div>
+                <label>Ativo:</label>
+                <mat-radio-group formControlName="active" name="active">
+                    <mat-radio-button value="true">Sim</mat-radio-button>
+                    <mat-radio-button value="false">Não</mat-radio-button>
+                </mat-radio-group>
+            </div>
+            
+            <div>
+                <label>Recorrente:</label>
+                <mat-radio-group formControlName="recurrent" name="recurrent">
+                    <mat-radio-button value="true">Sim</mat-radio-button>
+                    <mat-radio-button value="false">Não</mat-radio-button>
+                </mat-radio-group>
+            </div>
+
+            <div class="revenue-buttons">
+                <button class="save" type="submit">Cadastrar</button>
+                <button class="cancel" type="button" (click)="toggleOpenRevenueModal()">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal" *ngIf="showDeleteRevenueModal && revenueToDelete">
+    <div class="modal-content">
+        <h2>Deseja Remover {{revenueToDelete.name}} ?</h2>
+
+        <div class="revenue-buttons">
+            <button class="save" type="button" (click)="onRemoveRevenue()">Remover</button>
+            <button class="cancel" type="button" (click)="toggleRevenueDeleteModal()">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal modal-expensses" *ngIf="showExpenssesModal">
+    <div class="modal-content content-expensses">
+        <div class="modal-expensses-header">
+            <h2 [ngClass]="{ active: !showExpensses }" (click)="showExpensses = false">Cartão</h2>
+            <h2 [ngClass]="{ active: showExpensses }" (click)="showExpensses = true">Outras</h2>
+        </div>
+
+        <form *ngIf="showExpensses" [formGroup]="expenssesForm" (ngSubmit)="onAddExpensses()">
+            <mat-form-field appearance="outline">
+                <mat-label>Data de Referência</mat-label>
+                <input matInput type="date" formControlName="referenceDate" name="date">
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+                <mat-label>Nome da Despesa</mat-label>
+                <input matInput type="text" formControlName="name" name="name">
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+                <mat-label>Valor</mat-label>
+                <input matInput type="number" formControlName="value" name="value">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Selecione a Categoria</mat-label>
+                <mat-select formControlName="category" name="category" (selectionChange)="onCategorySelection($event)">
+                  @for (category of categories; track category) {
+                    <mat-option [value]="category.name">{{category.name}}</mat-option>
+                  }
+                    <mat-option [value]="'add'">Adicionar Categoria</mat-option>
+                </mat-select>
+            </mat-form-field>
+            
+            <div>
+                <label>Ativo:</label>
+                <mat-radio-group formControlName="active" name="active">
+                    <mat-radio-button value="true">Sim</mat-radio-button>
+                    <mat-radio-button value="false">Não</mat-radio-button>
+                </mat-radio-group>
+            </div>
+            
+            <div>
+                <label>Recorrente:</label>
+                <mat-radio-group formControlName="recurrent" name="recurrent">
+                    <mat-radio-button value="true">Sim</mat-radio-button>
+                    <mat-radio-button value="false">Não</mat-radio-button>
+                </mat-radio-group>
+            </div>
+
+            <div class="revenue-buttons">
+                <button class="save" type="submit">Cadastrar</button>
+                <button class="cancel" type="button" (click)="toggleOpenExpenssesModal()">Cancelar</button>
+            </div>
+        </form>
+
+        <form *ngIf="!showExpensses && cards.length > 0" [formGroup]="cardExpenssesForm" (ngSubmit)="onAddCardExpensses()">
+            <mat-form-field appearance="outline">
+                <mat-label>Selecione o Cartão</mat-label>
+                <mat-select formControlName="cardId" name="cardId">
+                  @for (card of cards; track card) {
+                    <mat-option [value]="card.id">{{card.name}}</mat-option>
+                  }
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Data de Referência</mat-label>
+                <input matInput type="date" formControlName="referenceDate" name="date">
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+                <mat-label>Despesa</mat-label>
+                <input matInput type="text" formControlName="name" name="name">
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+                <mat-label>Valor</mat-label>
+                <input matInput type="number" formControlName="value" name="value">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Selecione a Categoria</mat-label>
+                <mat-select formControlName="category" name="category" (selectionChange)="onCategorySelection($event)">
+                  @for (category of categories; track category) {
+                    <mat-option [value]="category.name">{{category.name}}</mat-option>
+                  }
+                    <mat-option [value]="'add'">Adicionar Categoria</mat-option>
+                </mat-select>
+            </mat-form-field>
+    
+            <mat-form-field appearance="outline">
+                <mat-label>Parcelas</mat-label>
+                <input matInput type="number" formControlName="installments" name="installments">
+            </mat-form-field>
+            
+            <div>
+                <label>Ativo:</label>
+                <mat-radio-group formControlName="active" name="active">
+                    <mat-radio-button value="true">Sim</mat-radio-button>
+                    <mat-radio-button value="false">Não</mat-radio-button>
+                </mat-radio-group>
+            </div>
+            
+            <div>
+                <label>Recorrente:</label>
+                <mat-radio-group formControlName="recurrent" name="recurrent">
+                    <mat-radio-button value="true">Sim</mat-radio-button>
+                    <mat-radio-button value="false">Não</mat-radio-button>
+                </mat-radio-group>
+            </div>
+    
+            <div class="revenue-buttons">
+                <button class="save" type="submit">Cadastrar</button>
+                <button class="cancel" type="button" (click)="toggleOpenExpenssesModal()">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal modal-category" *ngIf="showCategoryModal">
+    <div class="modal-content content-category">
+        <h2>Adicionar Categoria</h2>
+
+        <form [formGroup]="categoryForm" (ngSubmit)="onAddCategory()">
+            <mat-form-field appearance="outline">
+                <mat-label>Nome da Categoria</mat-label>
+                <input matInput type="text" formControlName="name" name="name">
+            </mat-form-field>
+
+            <div class="revenue-buttons">
+                <button class="save" type="submit">Cadastrar</button>
+                <button class="cancel" type="button" (click)="showCategoryModal = false">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal" *ngIf="showDeleteExpenssesModal && expenssesToDelete">
+    <div class="modal-content">
+        <h2>Deseja Remover {{expenssesToDelete.name}} ?</h2>
+
+        <div class="revenue-buttons">
+            <button class="save" type="button" (click)="onRemoveExpensses()">Remover</button>
+            <button class="cancel" type="button" (click)="toggleExpenssesDeleteModal()">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal" *ngIf="showCardExtractModal">
+    <div class="modal-content modal-card-extract">
+        <div class="modal-card-extract-header">
+            <h2>Extrato Cartão</h2>
+            <mat-icon (click)="showCardExtractModal = false">close</mat-icon>
+        </div>
+
+        <div class="extract-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Despesa</th>
+                        <th>Valor</th>
+                        <th>Categoria</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of userExtract.cardExpensess">
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.value | number: '1.2-2' }}</td>
+                        <td>{{ item.category }}</td>
+                        <td><mat-icon (click)="toggleCardExpenssesDeleteModal(item)">delete</mat-icon></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal" *ngIf="showDeleteCardExpenssesModal && cardExpenssesToDelete">
+    <div class="modal-content">
+        <h2>Deseja Remover o Item?</h2>
+
+        <div class="card-buttons">
+            <button class="save" type="button" (click)="onRemoveCardExpensses()">Remover</button>
+            <button class="cancel" type="button" (click)="toggleCardExpenssesDeleteModal()">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <button mat-icon-button (click)="changeMonth(-1)">
+        <mat-icon>arrow_back</mat-icon>
+    </button>
+
+    <span>{{ referenceDate | date: 'MMM yyyy' }}</span>
+    
+    <button mat-icon-button (click)="changeMonth(1)">
+        <mat-icon>arrow_forward</mat-icon>
+    </button>
+</footer>
+
