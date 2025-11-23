@@ -3,12 +3,13 @@ import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { CardGateway } from "../../domain/card/gateway/card.gateway";
 import { Card, CardExpensses, CardsExtract } from "../../domain/card/dto/card.dto";
+import { environment } from "../../../environments/environment";
 
 @Injectable({
   providedIn: 'root'
 })
 export class CardService implements CardGateway {
-  private apiUrl = "http://192.168.0.153:3000/api";
+  private apiUrl = environment.apiUrl;
 
   constructor(
     private httpServer: HttpClient

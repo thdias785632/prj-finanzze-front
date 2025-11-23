@@ -1,6 +1,7 @@
 import { HttpClient, HttpEvent } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
+import { environment } from '../../../environments/environment';
 import { UserGateway } from "../../domain/user/gateway/user.gateway";
 import { Login, User, UserExtract } from "../../domain/user/dto/user.dto";
 
@@ -8,7 +9,7 @@ import { Login, User, UserExtract } from "../../domain/user/dto/user.dto";
   providedIn: 'root'
 })
 export class UserService implements UserGateway {
-  private apiUrl = "http://192.168.0.153:3000/api";
+  private apiUrl = environment.apiUrl;
 
   constructor(
     private httpServer: HttpClient
