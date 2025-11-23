@@ -47,7 +47,7 @@ export class DashboardChartComponent implements OnChanges, AfterViewInit, OnDest
     }
 
     const currency = (v: number) =>
-      new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
+      new Intl.NumberFormat('pt-BR').format(v);
 
     this.chart = new Chart(ctx, {
       type: 'doughnut',
@@ -81,6 +81,7 @@ export class DashboardChartComponent implements OnChanges, AfterViewInit, OnDest
           },
           legend: {
             position: 'right',
+            maxWidth: 500,
             labels: {
               generateLabels: (chart) => {
                 const data = chart.data;
