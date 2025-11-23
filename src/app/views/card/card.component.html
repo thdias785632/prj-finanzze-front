@@ -1,0 +1,92 @@
+<app-navbar [header]="'Cartões'"></app-navbar>
+
+<app-notification></app-notification>
+
+<app-loader [isLoading]="isLoading"></app-loader>
+
+<div class="container">
+    <section>
+        <div class="new-itens">
+            <button (click)="showCreateCardModal = true">Novo Cartão</button>
+        </div>
+
+        <div class="extract" *ngIf="cardsExtract.length > 0">
+            <div class="extract-item" *ngFor="let cardExtract of cardsExtract">
+                <div class="header">
+                    <div>
+                        <h2>Fatura</h2>
+                        <p>R$ {{ cardExtract.total | number: '1.2-2' }}</p>
+                    </div>
+
+                    <h2>{{ cardExtract.card.name | titlecase }}</h2>
+                </div>
+
+                <div class="extract-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Despesa</th>
+                                <th>Valor</th>
+                                <th>Data</th>
+                                <th>Categoria</th>
+                                <th>Parcela</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of cardExtract.cardExpensess">
+                                <td>{{ item.name }}</td>
+                                <td>{{ item.value | number: '1.2-2' }}</td>
+                                <td>{{ item.referenceDate | date: 'dd/MM' }}</td>
+                                <td>{{ item.category }}</td>
+                                <td>{{ item.installments > 0 ? item.installmentsActual + '/' + item.installments : '-' }}</td>
+                                <td><mat-icon (click)="toggleCardExpenssesDeleteModal(item)">delete</mat-icon></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<div class="modal" *ngIf="showCreateCardModal">
+    <div class="modal-content">
+        <h2>Criar Cartão</h2>
+        <form [formGroup]="cardForm" (ngSubmit)="onCreateCard()">
+            <mat-form-field appearance="outline">
+                <mat-label>Nome</mat-label>
+                <input matInput type="text" formControlName="name" name="name">
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+                <mat-label>Bandeira</mat-label>
+                <input matInput type="text" formControlName="flag" name="flag">
+            </mat-form-field>
+            
+            <div>
+                <label>Ativo:</label>
+                <mat-radio-group formControlName="active" name="active">
+                    <mat-radio-button value="true">Sim</mat-radio-button>
+                    <mat-radio-button value="false">Não</mat-radio-button>
+                </mat-radio-group>
+            </div>
+            
+            <div class="card-buttons">
+                <button class="save" type="submit">Cadastrar</button>
+                <button class="cancel" type="button" (click)="showCreateCardModal = false">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal" *ngIf="showDeleteCardExpenssesModal && cardExpenssesToDelete">
+    <div class="modal-content">
+        <h2>Deseja Remover o Item?</h2>
+
+        <div class="card-buttons">
+            <button class="save" type="button" (click)="onRemoveCardExpensses()">Remover</button>
+            <button class="cancel" type="button" (click)="toggleCardExpenssesDeleteModal()">Cancelar</button>
+        </div>
+    </div>
+</div>

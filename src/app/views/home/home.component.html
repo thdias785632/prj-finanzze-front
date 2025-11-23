@@ -1,0 +1,38 @@
+<app-loader [isLoading]="isLoading"></app-loader>
+
+<div class="container">
+    <section>
+        <div class="title">
+            <h1>FINNANZE</h1>
+            <h2>Controle Financeiro</h2>
+        </div>
+
+        <div class="container-form">
+            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+                <h2>Bem vindo a sua plataforma de controle financeiro</h2>
+                
+                <mat-form-field appearance="outline">
+                    <mat-label>Email</mat-label>
+                    <input matInput type="email" placeholder="Email" formControlName="email">
+                    <mat-icon matSuffix>email</mat-icon>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                    <mat-label>Senha</mat-label>
+                    <input matInput [type]="hidePassword ? 'password' : 'text'" placeholder="Senha" formControlName="password">
+                    <button mat-icon-button matSuffix type="button" (click)="togglePasswordVisibility()">
+                        <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                    </button>
+                </mat-form-field>
+                
+                <button class="home-button" type="submit">Entrar</button>
+                
+                <h3>Não tem conta? Cadastre-se</h3>
+                
+                <button class="home-button">Cadastrar</button>
+            </form>
+        </div>
+    </section>
+
+    <app-notification></app-notification>
+</div>

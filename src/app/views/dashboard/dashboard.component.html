@@ -1,0 +1,75 @@
+<app-navbar [header]="'Resumo'"></app-navbar>
+<app-loader [isLoading]="isLoading"></app-loader>
+
+<div class="container">
+    <section>
+        <div class="extract">
+            <div class="saldo-extract" [routerLink]="'/extract'">
+                <h1>
+                    Saldo
+                </h1>
+    
+                <div class="extract-item" *ngIf="userExtract">
+                    <div class="revenues">
+                        <h2>Renda</h2>
+                        <p>R$ {{ userExtract.totalRevenues | number: '1.2-2' }}</p>
+                    </div>
+    
+                    <div class="expenses">
+                        <h2>Gastos</h2>
+                        <p>R$ {{ userExtract.totalExpensess | number: '1.2-2' }}</p>
+                    </div>
+    
+                    <hr/>
+                    
+                    <div class="balance-container">
+                        <div class="balance">
+                            <h2>Saldo</h2>
+                            <p>R$ {{ userExtract.totalRevenues - userExtract.totalExpensess | number: '1.2-2' }}</p>
+                        </div>
+    
+                        <h2>{{ date | date: 'MMM/YYYY' }}</h2>
+                    </div>
+    
+                </div>
+            </div>
+
+            <div class="card-extract" *ngIf="cardsExtract && cardsExtract.length > 0" [routerLink]="'/card'">
+                <h1>
+                    Cartões
+                </h1>
+    
+                <div class="card-extract__item" *ngFor="let extract of cardsExtract">
+                    <div class="card-extract-header">
+                        <div>
+                            <h2>Fatura:</h2>
+                            <p>R$ {{ extract.total | number: '1.2-2' }}</p>
+                        </div>
+
+                        <div class="card-name">
+                            <span>{{ extract.card.name }}</span>
+                            <span>{{ extract.card.flag }}</span>
+                        </div>
+                    </div>
+    
+                    <div class="expenses">
+                        <div *ngFor="let expenses of extract.cardExpensess| slice:0:3">
+                            <p>{{ expenses.name }}</p>
+                            <p>R$ {{ expenses.value | number: '1.2-2' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-extract" *ngIf="categoriesGrouped">
+                <h1>
+                    Categorias
+                </h1>
+
+                <div class="chart-extract__item">
+                    <app-dashboard-chart [data]="categoriesGrouped"></app-dashboard-chart>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

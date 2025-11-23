@@ -1,0 +1,94 @@
+$primary: #6639A6;
+$primary-light: #F2EAFD;
+$secondary: #A583D4;
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: $primary;
+  color: #ffffff;
+  padding: 16px;
+  position: fixed;
+  top: 0;
+  width: calc(100% - 32px);
+  z-index: 1000;
+
+  .menu-icon {
+    cursor: pointer;
+    font-size: 24px;
+  }
+
+  .header {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    flex-grow: 1;
+  }
+
+  .user-icon {
+    position: relative;
+    cursor: pointer;
+
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 100%;
+      background-color: #ffffff;
+      color: #000000;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+      padding: 8px;
+      z-index: 1001;
+
+      a {
+        display: block;
+        padding: 8px;
+        text-decoration: none;
+        color: #000000;
+
+        &:hover {
+          background-color: #f0f0f0;
+        }
+      }
+    }
+
+    &:hover .dropdown-menu {
+      display: block;
+    }
+  }
+}
+
+.side-menu {
+  position: fixed;
+  top: 62px;
+  left: -75%;
+  width: 175px;
+  height: calc(100% - 64px);
+  background-color: $primary-light;
+  color: $primary;
+  box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.1);
+  transition: left 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+
+  a {
+    padding: 16px 12px 16px 16px;
+    color: $primary;
+    text-decoration: none;
+    width: calc(100% - 28px);
+    position: relative;
+    border-bottom: 1px solid rgba($primary, 0.25);
+    font-weight: 500;
+    font-size: 18px;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &.open {
+    left: 0;
+  }
+}

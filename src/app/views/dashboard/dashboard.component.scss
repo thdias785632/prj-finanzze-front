@@ -1,0 +1,177 @@
+$primary: #6639A6;
+$primary-light: #F2EAFD;
+$secondary: #A583D4;
+$red-500: #B20000;
+$green-500: #007505;
+$blue-500: #0065C1;
+$gray-700: #1A1A1A;
+
+.container {
+  background-color: $primary-light;
+  height: 100%;
+  margin: 64px 0 0;
+  padding: 16px;
+
+  section {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: start;
+  }   
+}
+
+h1 {
+    color: $primary;
+    font-size: 30px;
+    margin: 0px;
+    font-family: 'Asap';
+    font-weight: 400;
+}
+  
+h2 {
+    color: $primary;
+    font-size: 19px;
+    margin: 0px;
+    font-weight: 300;
+    font-family: 'Asap';
+}
+
+h3 {
+    color: $primary;
+    font-size: 12px;
+    margin: 0px;
+    font-weight: 300;
+    font-family: 'Asap';
+}
+
+.extract {
+  width: 100%;;
+}
+
+.extract-item {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: start;
+  padding: 12px;
+  border-radius: 6px;
+  background-color: #ffffff;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.revenues, .expenses, .balance {
+  p {
+    font-weight: bold;
+  }
+  
+  h2 {
+    color: #718EBF
+  }
+}
+
+.revenues {
+  color: $green-500;
+}
+
+.expenses {
+  color: $red-500;
+}
+
+.balance {
+  color: $blue-500;
+}
+
+.balance-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+
+  h2 {
+    color: #718EBF
+  }
+}
+
+.extract-item, .card-extract__item {
+  :hover {
+    cursor: pointer;
+  }
+}
+
+.card-extract {
+  margin-bottom: 16px;
+  width: 100%;
+  
+  h1 {
+    margin-top: 16px;
+  }
+
+  .card-extract__item {
+    display: flex;
+    flex-direction: column;
+    margin-top: 24px;
+    padding: 16px;
+    border-radius: 12px;
+    background-color: $primary;
+    
+    .card-extract-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      width: 100%;
+      margin-bottom: 24px;
+    
+      h2 {
+        color: #FFFFFF;
+      }
+    
+      p {
+        color: #FFFFFF;
+        font-weight: bold;
+        margin: 4px 0px 0px 0px;
+      }
+    
+      div {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+  
+      .card-name{
+        display: flex;
+        flex-direction: column;
+        align-items: center;;
+  
+        span{
+          color: #FFFFFF;
+        }
+      }
+    }
+  
+    .expenses {
+      margin-top: 4px;
+      width: 60%;
+  
+      div {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        margin-bottom: 1px;
+        
+        p {
+          color: #FFFFFF;
+          margin: 0px 0px 4px 0px;
+          font-weight: normal;
+        }
+      }
+      
+    }
+  }
+}
+
+.chart-extract__item {
+  padding-top: 16px;
+}
