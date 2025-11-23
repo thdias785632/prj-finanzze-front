@@ -33,8 +33,11 @@ import { LoaderComponent } from '../../components/loader/loader.component';
 })
 export class HomeComponent implements OnInit {
   loginForm!: FormGroup;
+  signupForm!: FormGroup;
   hidePassword: boolean = true;
   isLoading = false;
+
+  showSignup = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -49,6 +52,12 @@ export class HomeComponent implements OnInit {
 
   buildForm(): void {
     this.loginForm = this.formBuilder.group({
+      email: new FormControl('', [Validators.required, Validators.email]),
+      password: new FormControl('', [Validators.required])
+    });
+
+    this.signupForm = this.formBuilder.group({
+      name: new FormControl('', [Validators.required, Validators.pattern('^[a-zA-Z ]+$'), Validators.minLength(3)]),
       email: new FormControl('', [Validators.required, Validators.email]),
       password: new FormControl('', [Validators.required])
     });
@@ -71,6 +80,39 @@ export class HomeComponent implements OnInit {
           this.isLoading = false;
 
           this.router.navigate(['/dashboard']);
+        }, (error) => {
+          this.isLoading = false;
+          
+          this.notificationService.showMessage(error.error.message, 'error');
+        }
+      );
+    }
+  }
+
+  async onSignupSubmit(): Promise<void> {
+    if (this.signupForm.valid) {
+      this.isLoading = true;
+
+      const formData = this.signupForm.value;
+
+      this.userService.createUser(formData).subscribe(
+        () => {
+          this.userService.login({
+            email: formData.email,
+            password: formData.password
+          }).subscribe(
+            (response) => {
+              this.userService.setUser(response);
+              
+              this.isLoading = false;
+
+              this.router.navigate(['/dashboard']);
+            }, (error) => {
+              this.isLoading = false;
+              
+              this.notificationService.showMessage(error.error.message, 'error');
+            }
+          );
         }, (error) => {
           this.isLoading = false;
           

@@ -3,7 +3,7 @@ import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { environment } from '../../../environments/environment';
 import { UserGateway } from "../../domain/user/gateway/user.gateway";
-import { Login, User, UserExtract } from "../../domain/user/dto/user.dto";
+import { CreateUser, Login, User, UserExtract } from "../../domain/user/dto/user.dto";
 
 @Injectable({
   providedIn: 'root'
@@ -26,6 +26,22 @@ export class UserService implements UserGateway {
     
     return this.httpServer.post<User>(
         `${this.apiUrl}/user/login`, data
+    );
+  }
+
+  createUser({
+    name,
+    email,
+    password
+  }: CreateUser): Observable<void> {
+    const data = {
+      name,
+      email,
+      password
+    };
+    
+    return this.httpServer.post<void>(
+        `${this.apiUrl}/user/create`, data
     );
   }
 

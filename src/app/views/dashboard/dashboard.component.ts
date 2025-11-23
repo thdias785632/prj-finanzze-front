@@ -130,6 +130,10 @@ export class DashboardComponent implements OnInit {
 
         this.categoriesGrouped = Object.fromEntries(
             Object.entries(categoryMap).sort(([, a], [, b]) => b - a)
-        );;
+        );
+
+        if (Object.keys(this.categoriesGrouped).length === 0) {
+            this.categoriesGrouped = { 'Sem categorias': 1 }
+        }
     }
 }
