@@ -28,3 +28,18 @@ body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
   overflow-x: hidden;
 }
+
+//styles for scrollbar
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.05);
+}

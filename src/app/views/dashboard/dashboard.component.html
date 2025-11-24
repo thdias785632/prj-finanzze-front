@@ -11,8 +11,12 @@
     
                 <div class="extract-item" *ngIf="userExtract">
                     <div class="revenues">
-                        <h2>Renda</h2>
-                        <p>R$ {{ userExtract.totalRevenues | number: '1.2-2' }}</p>
+                        <div>
+                            <h2>Renda</h2>
+                            <p>R$ {{ userExtract.totalRevenues | number: '1.2-2' }}</p>
+                        </div>
+
+                        <button [routerLink]="'/extract'">Editar</button>
                     </div>
     
                     <div class="expenses">

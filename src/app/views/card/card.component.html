@@ -47,6 +47,11 @@
                 </div>
             </div>
         </div>
+
+        <div class="no-card-found" *ngIf="cardsExtract.length === 0">
+            <mat-icon class="no-data-icon">credit_card</mat-icon>
+            <h2>Nenhum cartão cadastrado.</h2>
+        </div>
     </section>
 </div>
 

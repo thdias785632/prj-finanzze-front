@@ -72,6 +72,21 @@ h3 {
 
 .revenues {
   color: $green-500;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+
+  button {
+    height: 35px;
+    background-color: $primary;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    cursor: pointer;
+  }
 }
 
 .expenses {

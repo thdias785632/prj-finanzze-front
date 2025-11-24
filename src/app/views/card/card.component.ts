@@ -18,6 +18,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { User } from '../../domain/user/dto/user.dto';
 import { Card, CardExpensses, CardsExtract } from '../../domain/card/dto/card.dto';
 import { formatDateToAmericanFormat } from '../../utils/date';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-card',
@@ -34,7 +35,8 @@ import { formatDateToAmericanFormat } from '../../utils/date';
     FormsModule,
     ReactiveFormsModule,
     NotificationComponent,
-    MatSelectModule
+    MatSelectModule,
+    RouterModule,
   ],
   templateUrl: './card.component.html',
   styleUrl: './card.component.scss',
@@ -67,12 +69,17 @@ export class CardComponent implements OnInit {
     private userService: UserGateway,
     private cardService: CardGateway,
     private notificationService: NotificationService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
     this.user = this.userService.getUser();
 
     this.buildForm();
+
+    if (this.router.routerState.snapshot.root.queryParams['openModal']) {
+      this.showCreateCardModal = true;
+    }
 
     this.getCards();
   }
@@ -81,7 +88,7 @@ export class CardComponent implements OnInit {
     this.cardForm = this.formBuilder.group({
       name: new FormControl('', [Validators.required]),
       active: new FormControl(true, [Validators.required]),
-      flag: new FormControl(0, [Validators.required]),
+      flag: new FormControl('', [Validators.required]),
     });
 
     this.cardExpenssesForm = this.formBuilder.group({

@@ -68,7 +68,7 @@ h3 {
 }
 
 .extract {
-  width: 100%;;
+  width: 100%;
 }
 
 .extract-item {
@@ -179,6 +179,9 @@ h3 {
 }
 
 .extract-table {
+    max-width: 100%;
+    overflow-x: scroll;
+    
     table {
         width: 100%;
         border-collapse: collapse;
@@ -199,4 +202,17 @@ h3 {
             background-color: #f1f1f1;
         }
     }
+}
+
+.no-card-found {
+  background-color: #ffffff;
+  border-radius: 6px;
+  padding: 8px 0px 8px 0px;
+  text-align: center;
+  width: 100%;
+
+  mat-icon{
+    font-size: 48px;
+    color: $primary;
+  }
 }

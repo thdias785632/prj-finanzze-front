@@ -41,7 +41,7 @@
                         <mat-icon (click)="toggleExpenssesDeleteModal(expense)">delete</mat-icon>
                     </div>
 
-                    <div class="expenses-item">
+                    <div class="expenses-item" *ngIf="userExtract.totalCardExpensess">
                         <p>R$ {{ userExtract.totalCardExpensess | number: '1.2-2' }}</p>
                         <h2>Cartão de Crédito</h2>
                         <mat-icon (click)="showCardExtractModal = true">visibility</mat-icon>
@@ -62,9 +62,9 @@
                     </div>
                 </div>
 
-                <div class="extract-item chart-extract" *ngIf="categoriesGrouped">
+                <div class="extract-item chart-extract" *ngIf="categoriesGrouped && (userExtract.totalExpensess || userExtract.totalCardExpensess)">
                     <h1>
-                        Categorias
+                        Gastos por Categoria
                     </h1>
 
                     <div class="chart-extract__item">
@@ -246,6 +246,10 @@
                 <button class="cancel" type="button" (click)="toggleOpenExpenssesModal()">Cancelar</button>
             </div>
         </form>
+
+        <div *ngIf="!showExpensses && cards.length === 0" class="new-card">
+            <button [routerLink]="['/card']" [queryParams]="{ openModal: true }">Adicionar Cartão</button>
+        </div>
     </div>
 </div>
 
