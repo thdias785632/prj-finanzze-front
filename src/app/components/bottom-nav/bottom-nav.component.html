@@ -1,0 +1,22 @@
+<!-- BOTTOM NAVIGATION - MOBILE FIRST -->
+<nav class="bottom-navigation">
+  <a 
+    *ngFor="let route of routes"
+    [routerLink]="route.path"
+    routerLinkActive="active"
+    [routerLinkActiveOptions]="{exact: route.exact || false}"
+    class="nav-item"
+    (click)="onRouteClick(route)">
+    
+    <!-- Ícone -->
+    <div class="icon-wrapper">
+      <mat-icon>{{ route.icon }}</mat-icon>
+    </div>
+    
+    <!-- Label -->
+    <span class="label">{{ route.label }}</span>
+    
+    <!-- Ripple effect background -->
+    <div class="ripple"></div>
+  </a>
+</nav>

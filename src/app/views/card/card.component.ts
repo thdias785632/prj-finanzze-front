@@ -9,7 +9,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { NavbarComponent } from '../../components/navbar/navbar.component';
 import { LoaderComponent } from '../../components/loader/loader.component';
 import { MatRadioModule } from '@angular/material/radio';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -28,7 +27,6 @@ import { Router, RouterModule } from '@angular/router';
     MatInputModule,
     MatIconModule,
     MatButtonModule,
-    NavbarComponent,
     LoaderComponent,
     MatButtonModule,
     MatRadioModule,

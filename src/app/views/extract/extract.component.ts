@@ -8,7 +8,6 @@ import { CommonModule } from '@angular/common';
 import { UserService } from '../../infra/user/user.service';
 import { UserGateway } from '../../domain/user/gateway/user.gateway';
 import { Expensses, Itens, Revenue, User, UserExtract } from '../../domain/user/dto/user.dto';
-import { NavbarComponent } from '../../components/navbar/navbar.component';
 import { LoaderComponent } from '../../components/loader/loader.component';
 import { MatRadioModule } from '@angular/material/radio';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -18,7 +17,7 @@ import { NotificationComponent } from '../../components/notification/notificatio
 import { CardGateway } from '../../domain/card/gateway/card.gateway';
 import { CardService } from '../../infra/card/card.service';
 import { Card, CardExpensses } from '../../domain/card/dto/card.dto';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { CategoriesGateway } from '../../domain/categories/gateway/categories.gateway';
 import { CategoriesService } from '../../infra/categories/categories.service';
 import { Categories } from '../../domain/categories/dto/categories.dto';
@@ -32,7 +31,6 @@ import { DashboardChartComponent } from '../../components/dashboard-chart/dashbo
     MatInputModule,
     MatIconModule,
     MatButtonModule,
-    NavbarComponent,
     LoaderComponent,
     MatButtonModule,
     MatRadioModule,

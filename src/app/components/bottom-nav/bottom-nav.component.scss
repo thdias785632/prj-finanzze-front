@@ -1,0 +1,243 @@
+// ========================================
+// VARIÁVEIS (padrão landing page)
+// ========================================
+$primary: #6639A6;
+$primary-dark: #4A1F7A;
+$primary-light: #F2EAFD;
+$secondary: #A583D4;
+$accent: #9D4EDD;
+$accent-bright: #C77DFF;
+$white: #FFFFFF;
+$text-light: #9CA3AF;
+
+$bottom-nav-height: 42px;
+$mobile: 768px;
+$desktop: 1024px;
+
+// ========================================
+// BOTTOM NAVIGATION - MOBILE FIRST
+// ========================================
+.bottom-navigation {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: $bottom-nav-height;
+  background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 8px 0;
+  z-index: 999;
+  box-shadow: 
+    0 -4px 16px rgba(0, 0, 0, 0.3),
+    0 0 32px rgba($accent, 0.2);
+  backdrop-filter: blur(16px);
+
+  // Desktop: pode ocultar ou manter (ajuste conforme necessidade)
+  @media (min-width: $desktop) {
+    // Opção 1: Ocultar no desktop
+    // display: none;
+    
+    // Opção 2: Manter mas com estilo diferente
+    justify-content: center;
+    gap: 24px;
+    padding: 0 24px 8px;
+  }
+
+  // ========================================
+  // ITEM DE NAVEGAÇÃO
+  // ========================================
+  .nav-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: end;
+    gap: 4px;
+    flex: 1;
+    max-width: 120px;
+    max-height: 42px;
+    text-decoration: none;
+    color: rgba($white, 0.6);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 8px;
+    overflow: hidden;
+
+    // Desktop: área de toque menor
+    @media (min-width: $desktop) {
+      flex: 0 0 auto;
+      max-width: 100px;
+      padding: 8px 16px;
+    }
+
+    // ========================================
+    // WRAPPER DO ÍCONE
+    // ========================================
+    .icon-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+      mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+        transition: all 0.3s ease;
+      }
+    }
+
+    // ========================================
+    // LABEL
+    // ========================================
+    .label {
+      font-size: 11px;
+      font-weight: 600;
+      font-family: 'Asap', sans-serif;
+      letter-spacing: 0.3px;
+      text-align: center;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      
+      @media (max-width: 360px) {
+        // Oculta label em telas muito pequenas
+        display: none;
+      }
+
+      @media (min-width: $desktop) {
+        font-size: 12px;
+      }
+    }
+
+    // ========================================
+    // RIPPLE EFFECT (fundo ao tocar)
+    // ========================================
+    .ripple {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba($white, 0.15) 0%, transparent 70%);
+      opacity: 0;
+      transform: scale(0);
+      transition: all 0.4s ease;
+      pointer-events: none;
+    }
+
+    // ========================================
+    // ESTADOS: HOVER (Desktop)
+    // ========================================
+    @media (min-width: $desktop) {
+      &:hover:not(.active) {
+        color: rgba($white, 0.9);
+        background: rgba($white, 0.08);
+
+        .icon-wrapper {
+          transform: translateY(-2px) scale(1.1);
+        }
+      }
+    }
+
+    // ========================================
+    // ESTADOS: PRESSED (Mobile)
+    // ========================================
+    &:active {
+      transform: scale(0.95);
+
+      .ripple {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    // ========================================
+    // ESTADO: ACTIVE (Rota ativa)
+    // ========================================
+    &.active {
+      color: $white;
+      top: 4px;
+      background: rgba($white, 0.12);
+
+      .active-indicator {
+        transform: translateX(-50%) scaleX(1);
+      }
+
+      .icon-wrapper {
+        transform: scale(1.15);
+
+        mat-icon {
+          color: $accent-bright;
+          filter: drop-shadow(0 0 8px rgba($accent-bright, 0.6));
+        }
+      }
+
+      .label {
+        font-weight: 700;
+        color: $accent-bright;
+        text-shadow: 0 0 8px rgba($accent-bright, 0.4);
+      }
+
+      // Glow effect sutil
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle at center, rgba($accent-bright, 0.15) 0%, transparent 70%);
+        pointer-events: none;
+      }
+    }
+  }
+}
+
+// ========================================
+// ANIMAÇÃO DE ENTRADA
+// ========================================
+@keyframes slideInBottom {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.bottom-navigation {
+  animation: slideInBottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// ========================================
+// SAFE AREA (iOS notch, Android gesture bar)
+// ========================================
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .bottom-navigation {
+    padding-bottom: calc(8px + env(safe-area-inset-bottom));
+    height: calc($bottom-nav-height + env(safe-area-inset-bottom));
+  }
+}
+
+// ========================================
+// ACESSIBILIDADE
+// ========================================
+.nav-item {
+  // Área de toque mínima de 48px (WCAG)
+  min-width: 48px;
+  min-height: 48px;
+
+  // Focus state para teclado
+  &:focus-visible {
+    outline: 2px solid $accent-bright;
+    outline-offset: 2px;
+    background: rgba($white, 0.12);
+  }
+}

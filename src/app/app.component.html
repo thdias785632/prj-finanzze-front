@@ -1,1 +1,14 @@
-<router-outlet></router-outlet>
+<div class="app-container">
+  
+  <!-- Navbar superior-->
+  <app-navbar *ngIf="showNav"></app-navbar>
+  
+  <!-- Conteúdo principal -->
+  <main>
+    <router-outlet></router-outlet>
+  </main>
+  
+  <!-- Bottom Navigation (NOVO) -->
+  <app-bottom-nav *ngIf="showNav"></app-bottom-nav>
+  
+</div>

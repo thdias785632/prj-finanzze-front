@@ -7,7 +7,6 @@ import { CommonModule } from '@angular/common';
 import { UserService } from '../../infra/user/user.service';
 import { UserGateway } from '../../domain/user/gateway/user.gateway';
 import { User, UserExtract } from '../../domain/user/dto/user.dto';
-import { NavbarComponent } from '../../components/navbar/navbar.component';
 import { LoaderComponent } from '../../components/loader/loader.component';
 import { DashboardChartComponent } from '../../components/dashboard-chart/dashboard-chart.component';
 import { formatDateToAmericanFormat } from '../../utils/date';
@@ -26,7 +25,6 @@ import { RouterModule } from '@angular/router';
     MatIconModule,
     MatButtonModule,
     RouterModule,
-    NavbarComponent,
     LoaderComponent,
     DashboardChartComponent
   ],

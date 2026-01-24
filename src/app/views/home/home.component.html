@@ -1,68 +1,226 @@
 <app-loader [isLoading]="isLoading"></app-loader>
 
-<div class="container">
-    <section>
-        <div class="title">
-            <h1>FINNANZE</h1>
-            <h2>Controle Financeiro</h2>
+<div class="landing-container">
+  
+  <!-- HERO SECTION -->
+  <section class="hero-section">
+    <div class="logo-container">
+      <h1>FICONTROL</h1>
+      <p class="tagline">Controle Financeiro</p>
+    </div>
+
+    <!-- Hero Text com animação typewriter da esquerda para direita -->
+    <div class="hero-content" [@heroAnimation]="heroState">
+      <!-- Mensagem com efeito typewriter -->
+      <h2 class="hero-title typewriter">
+        {{ displayedText }}
+        <span class="cursor" *ngIf="isTyping">|</span>
+      </h2>
+      
+      <!-- Subtitle aparece após typewriter -->
+      <p class="hero-subtitle" [@fadeInUp]="showSubtitle ? 'visible' : 'hidden'">
+        Controle completo das suas finanças pessoais em uma plataforma intuitiva, moderna e segura
+      </p>
+      
+      <button 
+        [@fadeInUp]="showCTA ? 'visible' : 'hidden'"
+        class="cta-primary" 
+        (click)="scrollToAuth(); animateCTA()"
+        [@ctaAnimation]="ctaState">
+        Começar Agora
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+
+      <!-- Scroll indicator -->
+      <div 
+        class="scroll-indicator" 
+        [@fadeIn]="showScrollIndicator ? 'visible' : 'hidden'"
+        (click)="scrollToPreview()">
+        <mat-icon>keyboard_arrow_down</mat-icon>
+      </div>
+    </div>
+  </section>
+
+  <!-- PREVIEW DA EXPERIÊNCIA -->
+  <section class="preview-section" #previewSection>
+    <div class="section-header" [@fadeInUp]="sectionHeadersState[0]">
+      <h3 class="section-title">Sua vida financeira organizada</h3>
+      <p class="section-subtitle">Veja como é simples controlar seu dinheiro com ferramentas poderosas</p>
+    </div>
+
+    <div class="preview-grid">
+      
+      <!-- Card 1: Saldo Geral -->
+      <div 
+        #previewCard
+        class="preview-card balance-card" 
+        data-index="0"
+        [@cardAnimation]="previewCardsState[0]">
+        <div class="card-header">
+          <mat-icon>account_balance_wallet</mat-icon>
+          <h4>Visão Geral</h4>
         </div>
-
-        <div class="container-form">
-            <form *ngIf="!showSignup" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-                <h2>Bem vindo a sua plataforma de controle financeiro</h2>
-                
-                <mat-form-field appearance="outline">
-                    <mat-label>Email</mat-label>
-                    <input matInput type="email" placeholder="Email" formControlName="email">
-                    <mat-icon matSuffix>email</mat-icon>
-                </mat-form-field>
-
-                <mat-form-field appearance="outline">
-                    <mat-label>Senha</mat-label>
-                    <input matInput [type]="hidePassword ? 'password' : 'text'" placeholder="Senha" formControlName="password">
-                    <button mat-icon-button matSuffix type="button" (click)="togglePasswordVisibility()">
-                        <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
-                    </button>
-                </mat-form-field>
-                
-                <button class="home-button" type="submit">Entrar</button>
-                
-                <h3>Não tem conta? Cadastre-se</h3>
-                
-                <button class="home-button" (click)="showSignup = true">Cadastrar</button>
-            </form>
-
-            <form *ngIf="showSignup" [formGroup]="signupForm" (ngSubmit)="onSignupSubmit()">
-                <h2>Registre-se</h2>
-                
-                <mat-form-field appearance="outline">
-                    <mat-label>Nome</mat-label>
-                    <input matInput type="text" placeholder="Nome" formControlName="name">
-                    <mat-icon matSuffix>person</mat-icon>
-                </mat-form-field>
-
-                <mat-form-field appearance="outline">
-                    <mat-label>Email</mat-label>
-                    <input matInput type="email" placeholder="Email" formControlName="email">
-                    <mat-icon matSuffix>email</mat-icon>
-                </mat-form-field>
-
-                <mat-form-field appearance="outline">
-                    <mat-label>Senha</mat-label>
-                    <input matInput [type]="hidePassword ? 'password' : 'text'" placeholder="Senha" formControlName="password">
-                    <button mat-icon-button matSuffix type="button" (click)="togglePasswordVisibility()">
-                        <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
-                    </button>
-                </mat-form-field>
-                
-                <button class="home-button" type="submit">Cadastrar</button>
-                
-                <h3>Já tem conta? Faça Login</h3>
-                
-                <button class="home-button" (click)="showSignup = false">Logar</button>
-            </form>
+        <div class="balance-summary">
+          <div class="balance-item income" [@scaleIn]="previewCardsState[0] === 'visible' ? 'visible' : 'hidden'">
+            <span class="label">Entradas</span>
+            <span class="value">R$ {{ previewData.balance.income | number:'1.2-2' }}</span>
+          </div>
+          <div class="balance-item expense" [@scaleIn]="previewCardsState[0] === 'visible' ? 'visible' : 'hidden'">
+            <span class="label">Saídas</span>
+            <span class="value">R$ {{ previewData.balance.expense | number:'1.2-2' }}</span>
+          </div>
+          <div class="balance-item total" [@scaleIn]="previewCardsState[0] === 'visible' ? 'visible' : 'hidden'">
+            <span class="label">Saldo</span>
+            <span class="value highlight">R$ {{ previewData.balance.total | number:'1.2-2' }}</span>
+          </div>
         </div>
-    </section>
+      </div>
 
-    <app-notification></app-notification>
+      <!-- Card 2: Transações Recentes -->
+      <div 
+        #previewCard
+        class="preview-card transactions-card" 
+        data-index="1"
+        [@cardAnimation]="previewCardsState[1]">
+        <div class="card-header">
+          <mat-icon>receipt_long</mat-icon>
+          <h4>Últimas Movimentações</h4>
+        </div>
+        <div class="transactions-list">
+          <div 
+            class="transaction-item" 
+            *ngFor="let transaction of previewData.recentTransactions; let i = index"
+            [@slideInLeft]="previewCardsState[1] === 'visible' ? 'visible' : 'hidden'"
+            [style.animation-delay]="(i * 100) + 'ms'"
+            [class.income]="transaction.type === 'income'"
+            [class.expense]="transaction.type === 'expense'">
+            <mat-icon>{{ transaction.icon }}</mat-icon>
+            <span class="description">{{ transaction.description }}</span>
+            <span class="amount">{{ transaction.value | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: Categorias -->
+      <div 
+        #previewCard
+        class="preview-card categories-card" 
+        data-index="2"
+        [@cardAnimation]="previewCardsState[2]">
+        <div class="card-header">
+          <mat-icon>pie_chart</mat-icon>
+          <h4>Gastos por Categoria</h4>
+        </div>
+        <div class="categories-list">
+          <div 
+            class="category-item" 
+            *ngFor="let category of previewData.categories; let i = index"
+            [@fadeInUp]="previewCardsState[2] === 'visible' ? 'visible' : 'hidden'"
+            [style.animation-delay]="(i * 150) + 'ms'">
+            <div class="category-info">
+              <span class="category-name">{{ category.name }}</span>
+              <span class="category-percentage">{{ category.percentage }}%</span>
+            </div>
+            <div class="category-bar">
+              <div 
+                class="category-fill" 
+                [style.width.%]="previewCardsState[2] === 'visible' ? category.percentage : 0"
+                [style.background-color]="category.color">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- AUTENTICAÇÃO -->
+  <section class="auth-section" *ngIf="showAuthForms" [@fadeIn]="'visible'">
+    <div class="auth-container">
+      
+      <!-- Login Form -->
+      <form 
+        *ngIf="!showSignup" 
+        [formGroup]="loginForm" 
+        (ngSubmit)="onSubmit()"
+        class="auth-form"
+        [@slideInUp]="'visible'">
+        <h2 class="form-title">Bem-vindo de volta!</h2>
+        <p class="form-subtitle">Entre na sua conta para continuar controlando suas finanças</p>
+        
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" placeholder="seu@email.com" formControlName="email">
+          <mat-icon matSuffix>email</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Senha</mat-label>
+          <input matInput [type]="hidePassword ? 'password' : 'text'" placeholder="••••••••" formControlName="password">
+          <button mat-icon-button matSuffix type="button" (click)="togglePasswordVisibility()">
+            <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </mat-form-field>
+        
+        <button class="submit-button" type="submit">
+          <span>Entrar</span>
+          <mat-icon>login</mat-icon>
+        </button>
+        
+        <div class="form-footer">
+          <p>Não tem conta?</p>
+          <button type="button" class="link-button" (click)="showSignup = true">
+            Cadastre-se gratuitamente
+          </button>
+        </div>
+      </form>
+
+      <!-- Signup Form -->
+      <form 
+        *ngIf="showSignup" 
+        [formGroup]="signupForm" 
+        (ngSubmit)="onSignupSubmit()"
+        class="auth-form"
+        [@slideInUp]="'visible'">
+        <h2 class="form-title">Crie sua conta</h2>
+        <p class="form-subtitle">É rápido, fácil e 100% gratuito</p>
+        
+        <mat-form-field appearance="outline">
+          <mat-label>Nome Completo</mat-label>
+          <input matInput type="text" placeholder="Seu nome" formControlName="name">
+          <mat-icon matSuffix>person</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" placeholder="seu@email.com" formControlName="email">
+          <mat-icon matSuffix>email</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Senha</mat-label>
+          <input matInput [type]="hidePassword ? 'password' : 'text'" placeholder="••••••••" formControlName="password">
+          <button mat-icon-button matSuffix type="button" (click)="togglePasswordVisibility()">
+            <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </mat-form-field>
+        
+        <button class="submit-button" type="submit">
+          <span>Criar Conta</span>
+          <mat-icon>rocket_launch</mat-icon>
+        </button>
+        
+        <div class="form-footer">
+          <p>Já tem conta?</p>
+          <button type="button" class="link-button" (click)="showSignup = false">
+            Fazer login
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </section>
+
+  <app-notification></app-notification>
 </div>

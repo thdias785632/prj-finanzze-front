@@ -1,3 +1,5 @@
+$navbar-height: 62px;
+$bottom-nav-height: 62px;
 
 // Custom Theming for Angular Material
 // For more information: https://material.angular.dev/guide/theming
@@ -42,4 +44,26 @@ body {
 
 ::-webkit-scrollbar-track {
   background-color: rgba(0, 0, 0, 0.05);
+}
+
+// Conteúdo principal
+.main-content {
+  flex: 1;
+  margin-top: $navbar-height !important;
+  padding-bottom: $bottom-nav-height !important;
+  overflow-x: hidden;
+  
+  // Safe area para iOS (notch)
+  @supports (padding-bottom: env(safe-area-inset-bottom)) {
+    padding-bottom: calc($bottom-nav-height + env(safe-area-inset-bottom));
+  }
+  
+  // Desktop: ajustar se bottom-nav estiver oculta
+  @media (min-width: 1024px) {
+    // Opção 1: Se esconder bottom-nav no desktop
+    // padding-bottom: 24px;
+    
+    // Opção 2: Se manter bottom-nav no desktop
+    padding-bottom: $bottom-nav-height;
+  }
 }
