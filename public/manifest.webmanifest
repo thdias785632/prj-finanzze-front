@@ -13,14 +13,10 @@
   "dir": "ltr",
   "icons": [
     {
-      "src": "assets/image/logo-192.png",
+      "src": "icons/logo.png",
       "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "assets/image/logo-192.png",
-      "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "maskable any"
     }
   ],
   "shortcuts": [
