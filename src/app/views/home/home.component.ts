@@ -179,12 +179,14 @@ export class HomeComponent implements OnInit, AfterViewInit {
     balance: {
       income: 5420.50,
       expense: 3215.80,
-      total: 2204.70
+      total: 2204.70,
+      date: new Date()
     },
     recentTransactions: [
-      { description: 'Salário', value: 5000, type: 'income', icon: 'trending_up' },
-      { description: 'Aluguel', value: -1200, type: 'expense', icon: 'home' },
-      { description: 'Supermercado', value: -450.30, type: 'expense', icon: 'shopping_cart' }
+      { description: 'Salário', value: 5000, type: 'income' },
+      { description: 'Aluguel', value: 420.50, type: 'income' },
+      { description: 'Aluguel', value: 3000, type: 'expense' },
+      { description: 'Supermercado', value: 215.80, type: 'expense' }
     ],
     categories: [
       { name: 'Moradia', percentage: 38, color: '#C77DFF' },

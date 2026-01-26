@@ -14,10 +14,10 @@ $gradient-mid: #7209B7;
 $gradient-end: #6639A6;
 $glow: rgba(157, 78, 221, 0.6);
 
-$success: #10B981;
-$danger: #EF4444;
+$success: #007505;
+$danger: #B20000;
 $warning: #F59E0B;
-$info: #3B82F6;
+$info: #0065C1;
 
 $text-dark: #1F2937;
 $text-light: #6B7280;
@@ -406,7 +406,7 @@ $ease-elastic: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid rgba($white, 0.2);
-  border-radius: $radius-lg;
+  border-radius: $radius-md;
   padding: $spacing-md;
   box-shadow: 
     0 8px 32px rgba(0, 0, 0, 0.3),
@@ -471,133 +471,135 @@ $ease-elastic: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   .balance-summary {
     display: flex;
     flex-direction: column;
+    align-items: start;
     gap: $spacing-sm;
+    background: $white;
+    border-radius: $radius-sm;
+    padding: $spacing-md;
+    font-weight: bold;
   }
 
   .balance-item {
     display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    
+    .label, .date {
+      color: #718EBF;
+      margin-bottom: 4px;
+    };
+  }
+
+  .income {
+    .value {
+      color: $success;
+    }
+  }
+
+  .expense {
+    .value {
+      color: $danger;
+    }
+  }
+
+  .total {
+    display: flex;
+    flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    padding: $spacing-sm $spacing-md;
-    background: rgba($white, 0.08);
-    backdrop-filter: blur(10px);
-    border-radius: $radius-sm;
-    border: 1px solid rgba($white, 0.1);
-    transition: all 0.3s ease;
+    width: 100%;
 
-    &:hover {
-      background: rgba($white, 0.12);
-      transform: translateX(4px);
+    .left {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .value{
+      color: $info
     }
 
-    .label {
-      color: rgba($white, 0.7);
-      font-size: 14px;
-      font-weight: 600;
-      font-family: 'Asap', sans-serif;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .value {
-      color: $white;
-      font-size: 18px;
-      font-weight: 800;
-      font-family: 'Asap', sans-serif;
-      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-
-      &.highlight {
-        color: $accent-bright;
-        font-size: 24px;
-        text-shadow: 0 0 20px rgba($accent-bright, 0.6);
-      }
-    }
-
-    &.income .value {
-      color: $success;
-      text-shadow: 0 0 16px rgba($success, 0.5);
-    }
-
-    &.expense .value {
-      color: $danger;
-      text-shadow: 0 0 16px rgba($danger, 0.5);
+    .date {
+      font-weight: 500;
     }
   }
 }
 
 // Card específico: Transações
 .transactions-card {
-  .transactions-list {
+  .transactions-list-income, .transactions-list-expense {
     display: flex;
     flex-direction: column;
-    gap: $spacing-xs;
+    align-items: start;
+    gap: $spacing-sm;
+    background: $white;
+    border-radius: $radius-sm;
+    padding: $spacing-md;
+    font-weight: bold;
+    margin-bottom: $spacing-md;
+
+    .label{
+      color: #718EBF;
+      font-weight: 400;
+    }
+
+    .total {
+      color: $info;
+    }
+
+    .transaction-item {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      gap: $spacing-sm;
+      transition: all 0.3s $ease-smooth;
+  
+      &:hover {
+        background: rgba($white, 0.12);
+        transform: translateX(8px);
+      }
+  
+      mat-icon {
+        font-size: 22px;
+        width: 22px;
+        height: 22px;
+        color: rgba($white, 0.6);
+      }
+  
+      .description {
+        color: #718EBF;
+        font-size: 15px;
+        font-weight: 400;
+        font-family: 'Asap', sans-serif;
+      }
+    }
   }
 
-  .transaction-item {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    gap: $spacing-sm;
-    padding: $spacing-sm;
-    background: rgba($white, 0.06);
-    backdrop-filter: blur(10px);
-    border-radius: $radius-sm;
-    border-left: 3px solid transparent;
-    transition: all 0.3s $ease-smooth;
-
-    &:hover {
-      background: rgba($white, 0.12);
-      transform: translateX(8px);
-    }
-
-    mat-icon {
-      font-size: 22px;
-      width: 22px;
-      height: 22px;
-      color: rgba($white, 0.6);
-    }
-
-    .description {
-      color: $white;
-      font-size: 15px;
-      font-weight: 600;
-      font-family: 'Asap', sans-serif;
-    }
-
-    .amount {
-      color: $white;
-      font-size: 15px;
-      font-weight: 800;
-      font-family: 'Asap', sans-serif;
-    }
-
-    &.income {
-      border-left-color: $success;
+  .transactions-list-income {
+    .transaction-item {
+      &.expense-in {
+        display: none;
+      }
       
-      mat-icon {
+      &.income-in .amount {
         color: $success;
-      }
-      
-      .amount {
-        color: $success;
-        text-shadow: 0 0 12px rgba($success, 0.5);
-      }
-      
-      .amount::before {
-        content: '+';
+        font-weight: 800;
+        font-family: 'Asap', sans-serif;
       }
     }
+  }
 
-    &.expense {
-      border-left-color: $danger;
-      
-      mat-icon {
-        color: $danger;
+  .transactions-list-expense {
+    .transaction-item {
+      &.income-ex {
+        display: none;
       }
       
-      .amount {
+      &.expense-ex .amount {
         color: $danger;
-        text-shadow: 0 0 12px rgba($danger, 0.5);
+        font-weight: 800;
+        font-family: 'Asap', sans-serif;
       }
     }
   }

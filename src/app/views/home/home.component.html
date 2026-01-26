@@ -57,21 +57,31 @@
         data-index="0"
         [@cardAnimation]="previewCardsState[0]">
         <div class="card-header">
-          <mat-icon>account_balance_wallet</mat-icon>
-          <h4>Visão Geral</h4>
+          <mat-icon>dashboard</mat-icon>
+          <h4>Resumo</h4>
         </div>
         <div class="balance-summary">
           <div class="balance-item income" [@scaleIn]="previewCardsState[0] === 'visible' ? 'visible' : 'hidden'">
-            <span class="label">Entradas</span>
+            <span class="label">Renda</span>
             <span class="value">R$ {{ previewData.balance.income | number:'1.2-2' }}</span>
           </div>
+
           <div class="balance-item expense" [@scaleIn]="previewCardsState[0] === 'visible' ? 'visible' : 'hidden'">
-            <span class="label">Saídas</span>
+            <span class="label">Gastos</span>
             <span class="value">R$ {{ previewData.balance.expense | number:'1.2-2' }}</span>
           </div>
+
+          <hr/>
+
           <div class="balance-item total" [@scaleIn]="previewCardsState[0] === 'visible' ? 'visible' : 'hidden'">
-            <span class="label">Saldo</span>
-            <span class="value highlight">R$ {{ previewData.balance.total | number:'1.2-2' }}</span>
+            <div class="left">
+              <span class="label">Saldo</span>
+              <span class="value">R$ {{ previewData.balance.total | number:'1.2-2' }}</span>
+            </div>
+
+            <div>
+              <span class="date">{{ previewData.balance.date | date: 'MMM/YYYY' }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -84,20 +94,47 @@
         [@cardAnimation]="previewCardsState[1]">
         <div class="card-header">
           <mat-icon>receipt_long</mat-icon>
-          <h4>Últimas Movimentações</h4>
+          <h4>Extrato</h4>
         </div>
-        <div class="transactions-list">
+
+        <div class="transactions-list-income">
+          <span class="label"> Receitas do mês </span>
+          
           <div 
             class="transaction-item" 
             *ngFor="let transaction of previewData.recentTransactions; let i = index"
             [@slideInLeft]="previewCardsState[1] === 'visible' ? 'visible' : 'hidden'"
             [style.animation-delay]="(i * 100) + 'ms'"
-            [class.income]="transaction.type === 'income'"
-            [class.expense]="transaction.type === 'expense'">
-            <mat-icon>{{ transaction.icon }}</mat-icon>
+            [class.income-in]="transaction.type === 'income'"
+            [class.expense-in]="transaction.type === 'expense'">
+            <span class="amount"> R$ {{ transaction.value | number:'1.2-2' }}</span>
             <span class="description">{{ transaction.description }}</span>
-            <span class="amount">{{ transaction.value | number:'1.2-2' }}</span>
           </div>
+
+          <hr/>
+
+          <span class="label"> Total </span>
+          <span class="total"> R$ {{ previewData.balance.income | number:'1.2-2' }}</span>
+        </div>
+
+        <div class="transactions-list-expense">
+          <span class="label"> Despesas do mês </span>
+
+          <div 
+            class="transaction-item" 
+            *ngFor="let transaction of previewData.recentTransactions; let i = index"
+            [@slideInLeft]="previewCardsState[1] === 'visible' ? 'visible' : 'hidden'"
+            [style.animation-delay]="(i * 100) + 'ms'"
+            [class.income-ex]="transaction.type === 'income'"
+            [class.expense-ex]="transaction.type === 'expense'">
+            <span class="amount"> R$ {{ transaction.value | number:'1.2-2' }}</span>
+            <span class="description">{{ transaction.description }}</span>
+          </div>
+
+          <hr/>
+
+          <span class="label"> Total </span>
+          <span class="total"> R$ {{ previewData.balance.expense | number:'1.2-2' }}</span>
         </div>
       </div>
 
