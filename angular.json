@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "prj-finanzze-front": {
+    "prj-finannze-front": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/prj-finanzze-front",
+            "outputPath": "dist/prj-finannze-front",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -65,10 +65,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "prj-finanzze-front:build:production"
+              "buildTarget": "prj-finannze-front:build:production"
             },
             "development": {
-              "buildTarget": "prj-finanzze-front:build:development"
+              "buildTarget": "prj-finannze-front:build:development"
             }
           },
           "defaultConfiguration": "development",

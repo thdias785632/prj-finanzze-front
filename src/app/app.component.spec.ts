@@ -14,16 +14,16 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have the 'prj-finanzze-front' title`, () => {
+  it(`should have the 'prj-finannze-front' title`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('prj-finanzze-front');
+    expect(app.title).toEqual('prj-finannze-front');
   });
 
   it('should render title', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, prj-finanzze-front');
+    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, prj-finannze-front');
   });
 });

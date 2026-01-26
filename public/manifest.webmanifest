@@ -1,6 +1,6 @@
 {
-  "name": "FICONTROL - Controle Financeiro",
-  "short_name": "FICONTROL",
+  "name": "Finannze - Controle Financeiro",
+  "short_name": "Finannze",
   "description": "Controle completo das suas finanças pessoais em uma plataforma intuitiva, moderna e segura",
   "display": "standalone",
   "scope": "./",
