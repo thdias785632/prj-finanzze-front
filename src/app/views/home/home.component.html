@@ -5,7 +5,6 @@
   <!-- HERO SECTION -->
   <section class="hero-section">
     <div class="logo-container">
-      <img src="icons/logo-192.png" alt="">
       <h1>FINANNZE</h1>
       <p class="tagline">Controle Financeiro</p>
     </div>
@@ -20,7 +19,7 @@
       
       <!-- Subtitle aparece após typewriter -->
       <p class="hero-subtitle" [@fadeInUp]="showSubtitle ? 'visible' : 'hidden'">
-        Controle completo das suas finanças pessoais em uma plataforma intuitiva, moderna e segura
+        Controle completo das suas finanças pessoais em uma plataforma intuitiva, moderna e segura.
       </p>
       
       <button 
@@ -28,7 +27,7 @@
         class="cta-primary" 
         (click)="scrollToAuth(); animateCTA()"
         [@ctaAnimation]="ctaState">
-        Começar Agora
+        Entre ou Cadastre-se
         <mat-icon>arrow_forward</mat-icon>
       </button>
 
@@ -146,6 +145,7 @@
         data-index="2"
         [@cardAnimation]="previewCardsState[2]">
         <div class="card-header">
+          <span class="premium-badge">Versão Paga</span>
           <mat-icon>pie_chart</mat-icon>
           <h4>Gastos por Categoria</h4>
         </div>

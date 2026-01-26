@@ -145,15 +145,11 @@ $ease-elastic: cubic-bezier(0.175, 0.885, 0.32, 1.275);
     
     h1 {
       color: $white;
-      font-size: 56px;
+      font-size: 42px;
       margin: 0;
       font-family: 'Asap', sans-serif;
       font-weight: 900;
       letter-spacing: 4px;
-      // text-shadow: 
-      //   0 0 20px rgba($accent-bright, 0.8),
-      //   0 0 40px rgba($accent, 0.5),
-      //   0 4px 12px rgba(0, 0, 0, 0.3);
       background: $white;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -443,9 +439,24 @@ $ease-elastic: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
   .card-header {
     display: flex;
-    align-items: center;
-    gap: $spacing-sm;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-xs;
     margin-bottom: $spacing-md;
+    
+    .premium-badge {
+      background: linear-gradient(135deg, white, #FFD700);
+      color: $text-dark;
+      padding: 4px 12px;
+      border-radius: $radius-sm;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+      align-self: flex-start;
+      margin-bottom: $spacing-xs;
+    }
     
     mat-icon {
       color: $accent-bright;
@@ -678,10 +689,10 @@ $ease-elastic: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 // ========================================
 .auth-section {
   padding: $spacing-xl $spacing-md $spacing-2xl;
-  background: linear-gradient(180deg, 
-    $gradient-start 0%,
-    $gradient-mid 100%
-  );
+  // background: linear-gradient(180deg, 
+  //   $gradient-start 0%,
+  //   $gradient-mid 100%
+  // );
   
   @media (min-width: $tablet) {
     padding: $spacing-2xl $spacing-lg;

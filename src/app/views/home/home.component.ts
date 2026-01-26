@@ -169,7 +169,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   ctaState = 'idle';
 
   // Typewriter effect
-  fullText = 'Bem-vindo à sua plataforma de controle financeiro';
+  fullText = 'Bem-vindo à sua plataforma de controle financeiro!!';
   displayedText = '';
   isTyping = true;
   private typingSpeed = 60; // ms por caractere
