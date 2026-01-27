@@ -62,12 +62,12 @@
         </div>
         <div class="balance-summary">
           <div class="balance-item income" [@scaleIn]="previewCardsState[0] === 'visible' ? 'visible' : 'hidden'">
-            <span class="label">Renda</span>
+            <span class="label">Entradas</span>
             <span class="value">R$ {{ previewData.balance.income | number:'1.2-2' }}</span>
           </div>
 
           <div class="balance-item expense" [@scaleIn]="previewCardsState[0] === 'visible' ? 'visible' : 'hidden'">
-            <span class="label">Gastos</span>
+            <span class="label">Saídas</span>
             <span class="value">R$ {{ previewData.balance.expense | number:'1.2-2' }}</span>
           </div>
 
@@ -98,7 +98,7 @@
         </div>
 
         <div class="transactions-list-income">
-          <span class="label"> Receitas do mês </span>
+          <span class="label"> Entradas do mês </span>
           
           <div 
             class="transaction-item" 
@@ -118,7 +118,7 @@
         </div>
 
         <div class="transactions-list-expense">
-          <span class="label"> Despesas do mês </span>
+          <span class="label"> Saídas do mês </span>
 
           <div 
             class="transaction-item" 

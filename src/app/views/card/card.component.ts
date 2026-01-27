@@ -62,6 +62,8 @@ export class CardComponent implements OnInit {
 
   cardExpenssesToDelete: CardExpensses | undefined;
 
+  routeToReturn!: string;
+
   constructor(
     private formBuilder: FormBuilder,
     private userService: UserGateway,
@@ -78,6 +80,8 @@ export class CardComponent implements OnInit {
     if (this.router.routerState.snapshot.root.queryParams['openModal']) {
       this.showCreateCardModal = true;
     }
+    
+    this.routeToReturn = this.router.routerState.snapshot.root.queryParams['returnTo'];
 
     this.getCards();
   }
@@ -145,6 +149,10 @@ export class CardComponent implements OnInit {
           this.isLoading = false;
           
           this.notificationService.showMessage('Cartão criado com sucesso!', 'success');
+
+          if (this.routeToReturn) {
+            this.router.navigate([this.routeToReturn]);
+          }
         },
         error: (error) => {
           this.isLoading = false;

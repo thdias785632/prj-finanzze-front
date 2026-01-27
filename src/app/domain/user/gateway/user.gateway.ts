@@ -11,6 +11,7 @@ export abstract class UserGateway {
     abstract createRevenue(revenue: Revenue): Observable<void>;
     abstract deleteRevenue(id: string): Observable<void>;
     abstract createExpensses(expensses: Expensses): Observable<void>;
+    abstract updateExpensses(expensses: Expensses): Observable<void>;
     abstract deleteExpensses(id: string): Observable<void>;
     abstract sendExtract(email: string): Observable<void>;
 }

@@ -8,7 +8,7 @@
             <div *ngIf="userExtract">
                 <div class="extract-item revenues">
                     <div class="header">
-                        <h2>Receitas do mês</h2>
+                        <h2>Entradas do mês</h2>
                 
                         <mat-icon (click)="toggleOpenRevenueModal()">add</mat-icon>
                     </div>
@@ -29,14 +29,17 @@
 
                 <div class="extract-item expenses">
                     <div class="header">
-                        <h2>Despesas do mês</h2>
+                        <h2>Saídas do mês</h2>
 
                         <mat-icon (click)="toggleOpenExpenssesModal()">add</mat-icon>
                     </div>
                     <div *ngFor="let expense of userExtract.fixedExpensess" class="expenses-item">
                         <p>R$ {{ expense.value | number: '1.2-2' }}</p>
                         <h2>{{expense.name}}</h2>
-                        <mat-icon (click)="toggleExpenssesDeleteModal(expense)">delete</mat-icon>
+                        <div class="extract-table-actions">
+                            <mat-icon (click)="toggleExpenssesDeleteModal(expense)">delete</mat-icon>
+                            <!-- <mat-icon (click)="openExpenssesEditModal(expense)">edit</mat-icon> -->
+                        </div>
                     </div>
 
                     <div class="expenses-item" *ngIf="userExtract.totalCardExpensess">
@@ -84,7 +87,7 @@
             </mat-form-field>
             
             <mat-form-field appearance="outline">
-                <mat-label>Receita</mat-label>
+                <mat-label>Nomde da Entrada</mat-label>
                 <input matInput type="text" formControlName="name" name="name">
             </mat-form-field>
             
@@ -94,18 +97,10 @@
             </mat-form-field>
             
             <div>
-                <label>Ativo:</label>
-                <mat-radio-group formControlName="active" name="active">
-                    <mat-radio-button value="true">Sim</mat-radio-button>
-                    <mat-radio-button value="false">Não</mat-radio-button>
-                </mat-radio-group>
-            </div>
-            
-            <div>
                 <label>Recorrente:</label>
                 <mat-radio-group formControlName="recurrent" name="recurrent">
-                    <mat-radio-button value="true">Sim</mat-radio-button>
-                    <mat-radio-button value="false">Não</mat-radio-button>
+                    <mat-radio-button [value]="true">Sim</mat-radio-button>
+                    <mat-radio-button [value]="false">Não</mat-radio-button>
                 </mat-radio-group>
             </div>
 
@@ -130,19 +125,19 @@
 
 <div class="modal modal-expensses" *ngIf="showExpenssesModal">
     <div class="modal-content content-expensses">
-        <div class="modal-expensses-header">
+        <div class="modal-expensses-header" *ngIf="!editExpenssesMode">
             <h2 [ngClass]="{ active: !showExpensses }" (click)="showExpensses = false">Cartão</h2>
             <h2 [ngClass]="{ active: showExpensses }" (click)="showExpensses = true">Outras</h2>
         </div>
 
-        <form *ngIf="showExpensses" [formGroup]="expenssesForm" (ngSubmit)="onAddExpensses()">
+        <form *ngIf="showExpensses" [formGroup]="editExpenssesMode ? expenssesEditForm : expenssesForm" (ngSubmit)="editExpenssesMode ? onEditExpensses() : onAddExpensses()">
             <mat-form-field appearance="outline">
                 <mat-label>Data de Referência</mat-label>
                 <input matInput type="date" formControlName="referenceDate" name="date">
             </mat-form-field>
             
             <mat-form-field appearance="outline">
-                <mat-label>Nome da Despesa</mat-label>
+                <mat-label>Nome da Saída</mat-label>
                 <input matInput type="text" formControlName="name" name="name">
             </mat-form-field>
             
@@ -160,25 +155,25 @@
                     <mat-option [value]="'add'">Adicionar Categoria</mat-option>
                 </mat-select>
             </mat-form-field>
-            
-            <div>
-                <label>Ativo:</label>
+
+            <div *ngIf="editExpenssesMode">
+                <label>Válido para o mês atual?:</label>
                 <mat-radio-group formControlName="active" name="active">
-                    <mat-radio-button value="true">Sim</mat-radio-button>
-                    <mat-radio-button value="false">Não</mat-radio-button>
+                    <mat-radio-button [value]="true">Sim</mat-radio-button>
+                    <mat-radio-button [value]="false">Não</mat-radio-button>
                 </mat-radio-group>
             </div>
-            
+
             <div>
                 <label>Recorrente:</label>
                 <mat-radio-group formControlName="recurrent" name="recurrent">
-                    <mat-radio-button value="true">Sim</mat-radio-button>
-                    <mat-radio-button value="false">Não</mat-radio-button>
+                    <mat-radio-button [value]="true">Sim</mat-radio-button>
+                    <mat-radio-button [value]="false">Não</mat-radio-button>
                 </mat-radio-group>
             </div>
 
             <div class="revenue-buttons">
-                <button class="save" type="submit">Cadastrar</button>
+                <button class="save" type="submit">{{ editExpenssesMode ? 'Editar' : 'Cadastrar' }}</button>
                 <button class="cancel" type="button" (click)="toggleOpenExpenssesModal()">Cancelar</button>
             </div>
         </form>
@@ -199,7 +194,7 @@
             </mat-form-field>
             
             <mat-form-field appearance="outline">
-                <mat-label>Despesa</mat-label>
+                <mat-label>Nome da Saída</mat-label>
                 <input matInput type="text" formControlName="name" name="name">
             </mat-form-field>
             
@@ -224,18 +219,10 @@
             </mat-form-field>
             
             <div>
-                <label>Ativo:</label>
-                <mat-radio-group formControlName="active" name="active">
-                    <mat-radio-button value="true">Sim</mat-radio-button>
-                    <mat-radio-button value="false">Não</mat-radio-button>
-                </mat-radio-group>
-            </div>
-            
-            <div>
                 <label>Recorrente:</label>
                 <mat-radio-group formControlName="recurrent" name="recurrent">
-                    <mat-radio-button value="true">Sim</mat-radio-button>
-                    <mat-radio-button value="false">Não</mat-radio-button>
+                    <mat-radio-button [value]="true">Sim</mat-radio-button>
+                    <mat-radio-button [value]="false">Não</mat-radio-button>
                 </mat-radio-group>
             </div>
     
@@ -246,7 +233,7 @@
         </form>
 
         <div *ngIf="!showExpensses && cards.length === 0" class="new-card">
-            <button [routerLink]="['/card']" [queryParams]="{ openModal: true }">Adicionar Cartão</button>
+            <button [routerLink]="['/card']" [queryParams]="{ openModal: true, returnTo: '/extract' }">Adicionar Cartão</button>
         </div>
     </div>
 </div>
@@ -302,7 +289,10 @@
                         <td>{{ item.name }}</td>
                         <td>{{ item.value | number: '1.2-2' }}</td>
                         <td>{{ item.category }}</td>
-                        <td><mat-icon (click)="toggleCardExpenssesDeleteModal(item)">delete</mat-icon></td>
+                        <td class="extract-table-actions">
+                            <mat-icon (click)="toggleCardExpenssesDeleteModal(item)">delete</mat-icon>
+                            <!-- <mat-icon (click)="toggleCardExpenssesDeleteModal(item)">edit</mat-icon> -->
+                        </td>
                     </tr>
                 </tbody>
             </table>

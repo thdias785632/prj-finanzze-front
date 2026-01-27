@@ -29,6 +29,11 @@ export interface Itens {
     name: string;
     value: number;
     category?: string
+    referenceDate: Date;
+    recurrent: boolean;
+    active: boolean;
+    cardId?: string;
+    installment?: number;
 }
 
 export interface Revenue {
@@ -41,5 +46,6 @@ export interface Revenue {
 }
 
 export interface Expensses extends Revenue {
+    id?: string
     category: string;
 }

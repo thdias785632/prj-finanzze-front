@@ -67,21 +67,25 @@ export class ExtractComponent implements OnInit {
 
   showDeleteRevenueModal: boolean = false;
   showDeleteExpenssesModal: boolean = false;
+  showDeleteCardExpenssesModal: boolean = false;
+  
   showCategoryModal: boolean = false;
   showCardExtractModal: boolean = false;
   
   revenueForm!: FormGroup;
   expenssesForm!: FormGroup;
+  expenssesEditForm!: FormGroup;
   cardExpenssesForm!: FormGroup;
   categoryForm!: FormGroup;
   
   revenueToDelete: Itens | undefined = undefined;
   expenssesToDelete: Itens | undefined = undefined;
-
+  
   categoriesGrouped!: {[key: string]: number};
-
+  
   cardExpenssesToDelete: Itens | undefined;
-  showDeleteCardExpenssesModal: boolean = false;
+  
+  editExpenssesMode: boolean = false;
   
   constructor(
     private formBuilder: FormBuilder,
@@ -103,19 +107,19 @@ export class ExtractComponent implements OnInit {
 
   buildForm(): void {
     this.revenueForm = this.formBuilder.group({
-      referenceDate: new FormControl('', [Validators.required]),
+      referenceDate: new FormControl(formatDateToAmericanFormat(this.referenceDate), [Validators.required]),
       name: new FormControl('', [Validators.required]),
       value: new FormControl(0, [Validators.required]),
-      active: new FormControl(true, [Validators.required]),
-      recurrent: new FormControl(false, [Validators.required]),
+      active: new FormControl(true),
+      recurrent: new FormControl(false),
     });
 
     this.expenssesForm = this.formBuilder.group({
-      referenceDate: new FormControl('', [Validators.required]),
+      referenceDate: new FormControl(formatDateToAmericanFormat(this.referenceDate), [Validators.required]),
       name: new FormControl('', [Validators.required]),
       value: new FormControl(0, [Validators.required]),
-      active: new FormControl(true, [Validators.required]),
-      recurrent: new FormControl(false, [Validators.required]),
+      active: new FormControl(true),
+      recurrent: new FormControl(false),
       category: new FormControl('', [Validators.required]),
     });
 
@@ -123,10 +127,10 @@ export class ExtractComponent implements OnInit {
       cardId: new FormControl('', [Validators.required]),
       name: new FormControl('', [Validators.required]),
       value: new FormControl(0, [Validators.required]),
-      installments: new FormControl(0, [Validators.required]),
-      referenceDate: new FormControl('', [Validators.required]),
-      active: new FormControl(true, [Validators.required]),
-      recurrent: new FormControl(false, [Validators.required]),
+      installments: new FormControl(0, [Validators.min(0)]),
+      referenceDate: new FormControl(formatDateToAmericanFormat(this.referenceDate), [Validators.required]),
+      active: new FormControl(true),
+      recurrent: new FormControl(false),
       category: new FormControl('', [Validators.required]),
     });
 
@@ -240,13 +244,13 @@ export class ExtractComponent implements OnInit {
 
     if (this.showExpenssesModal) {
       this.expenssesForm.patchValue({
-        referenceDate: formatDateToBrazilianFormat(new Date()),
+        referenceDate: formatDateToAmericanFormat(this.referenceDate),
         active: true,
         recurrent: false,
       });
 
       this.cardExpenssesForm.patchValue({
-        referenceDate: formatDateToBrazilianFormat(new Date()),
+        referenceDate: formatDateToAmericanFormat(this.referenceDate),
         active: true,
         recurrent: false,
       });
@@ -292,6 +296,22 @@ export class ExtractComponent implements OnInit {
     this.showDeleteExpenssesModal = !this.showDeleteExpenssesModal;
   }
 
+  openExpenssesEditModal(expenssesItem: Itens): void {
+    this.expenssesEditForm = this.formBuilder.group({
+      id: new FormControl(expenssesItem.id),
+      referenceDate: new FormControl(formatDateToAmericanFormat(new Date(expenssesItem.referenceDate)), [Validators.required]),
+      name: new FormControl(expenssesItem.name, [Validators.required]),
+      value: new FormControl(expenssesItem.value, [Validators.required]),
+      active: new FormControl(expenssesItem.active),
+      recurrent: new FormControl(expenssesItem.recurrent),
+      category: new FormControl(expenssesItem.category, [Validators.required]),
+    });
+
+    this.editExpenssesMode = true;
+    this.showExpensses = true;
+    this.showExpenssesModal = true;
+  }
+
   onAddRevenue(): void {
     if (this.revenueForm.valid) {
       this.isLoading = true;
@@ -303,8 +323,8 @@ export class ExtractComponent implements OnInit {
         referenceDate: new Date(formData.referenceDate),
         name: formData.name,
         value: formData.value,
-        active: formData.active === 'true',
-        recurrent: formData.recurrent === 'true',
+        active: !!formData.active,
+        recurrent: !!formData.recurrent,
       };
 
       this.userService.createRevenue(revenue).subscribe(
@@ -314,6 +334,12 @@ export class ExtractComponent implements OnInit {
           this.toggleOpenRevenueModal();
 
           this.revenueForm.reset();
+          this.revenueForm.patchValue({
+            referenceDate: formatDateToAmericanFormat(this.referenceDate),
+            active: true,
+            recurrent: false,
+            value: 0
+          });
           
           this.notificationService.showMessage('Receita cadastrada com sucesso', 'success');
           },
@@ -342,8 +368,8 @@ export class ExtractComponent implements OnInit {
         name: formData.name,
         value: formData.value,
         category: formData.category,
-        active: formData.active === 'true',
-        recurrent: formData.recurrent === 'true',
+        active: !!formData.active,
+        recurrent: !!formData.recurrent,
       };
 
       this.userService.createExpensses(expensses).subscribe(
@@ -353,8 +379,63 @@ export class ExtractComponent implements OnInit {
           this.toggleOpenExpenssesModal();
 
           this.expenssesForm.reset();
+          this.expenssesForm.patchValue({
+            referenceDate: formatDateToAmericanFormat(this.referenceDate),
+            active: true,
+            recurrent: false,
+            value: 0
+          });
           
           this.notificationService.showMessage('Despesa cadastrada com sucesso', 'success');
+          },
+          (error) => {
+          this.isLoading = false;
+          
+          this.notificationService.showMessage(`${error.message}`, 'error');
+        }
+      );
+
+      return;
+    }
+
+    this.notificationService.showMessage('Preencha todos os campos corretamente', 'error');
+  }
+
+  onEditExpensses(): void {
+    if (this.expenssesEditForm.valid) {
+      this.isLoading = true;
+    
+      const formData = this.expenssesEditForm.value;
+
+      const expensses: Expensses = {
+        id: formData.id,
+        userId: this.user!.id,
+        referenceDate: new Date(formData.referenceDate),
+        name: formData.name,
+        value: formData.value,
+        category: formData.category,
+        active: !!formData.active,
+        recurrent: !!formData.recurrent,
+      };
+
+      this.userService.updateExpensses(expensses).subscribe(
+          () => {
+          this.getUserExtract();
+
+          this.editExpenssesMode = false;
+          this.showExpensses = false;
+          this.showExpenssesModal = false;
+
+          this.expenssesEditForm.reset();
+
+          this.expenssesEditForm.patchValue({
+            referenceDate: formatDateToAmericanFormat(this.referenceDate),
+            active: true,
+            recurrent: false,
+            value: 0
+          });
+          
+          this.notificationService.showMessage('Despesa atualizada com sucesso', 'success');
           },
           (error) => {
           this.isLoading = false;
@@ -381,10 +462,10 @@ export class ExtractComponent implements OnInit {
         referenceDate: new Date(formData.referenceDate),
         name: formData.name,
         value: formData.value,
-        installments: formData.installments,
+        installments: formData.installments || 0,
         category: formData.category,
-        active: formData.active === 'true',
-        recurrent: formData.recurrent === 'true',
+        active: !!formData.active,
+        recurrent: !!formData.recurrent,
       };
 
       this.cardService.createCardEspensses(cardExpensess).subscribe(
@@ -394,6 +475,13 @@ export class ExtractComponent implements OnInit {
           this.toggleOpenExpenssesModal();
 
           this.cardExpenssesForm.reset();
+          this.cardExpenssesForm.patchValue({
+            referenceDate: formatDateToAmericanFormat(this.referenceDate),
+            active: true,
+            recurrent: false,
+            value: 0,
+            installments: 0
+          });
           
           this.notificationService.showMessage('Despesa cadastrada com sucesso', 'success');
           },

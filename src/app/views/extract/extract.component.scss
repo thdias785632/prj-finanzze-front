@@ -136,6 +136,10 @@ h3 {
 
 }
 
+.expenses-item p {
+  min-width: 40%;
+}
+
 mat-icon {
   color: rgba(#718EBF, 0.3);
   font-size: 24px;
@@ -229,7 +233,7 @@ mat-icon {
   padding: 16px;
   background-color: #ffffff;
   color: $primary;
-  bottom: 0;
+  bottom: 48px;
   width: calc(100% - 32px);
   height: 20px;
   box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.3);
@@ -291,9 +295,12 @@ mat-icon {
 .modal-card-extract{
   height: 63%;
   overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 .extract-table {
+    overflow-x: scroll;
+
     table {
         width: 100%;
         border-collapse: collapse;
@@ -314,6 +321,10 @@ mat-icon {
             background-color: #f1f1f1;
         }
     }
+}
+
+.extract-table-actions {
+    display: flex;
 }
 
 .modal-card-extract-header {

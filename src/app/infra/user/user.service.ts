@@ -78,6 +78,12 @@ export class UserService implements UserGateway {
     );
   }
 
+  updateExpensses(expenses: any): Observable<void> {
+    return this.httpServer.put<void>(
+      `${this.apiUrl}/expensses`, expenses
+    );
+  }
+
   deleteExpensses(id: string): Observable<void> {
     return this.httpServer.delete<void>(
       `${this.apiUrl}/expensses?id=${id}`, {});
