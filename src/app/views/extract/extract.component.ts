@@ -216,6 +216,23 @@ export class ExtractComponent implements OnInit {
         );
   }
 
+  hasInactiveItems(ItensToSearch: 'expensses' | 'revenues' | 'carsExpensses'): boolean {
+    if (ItensToSearch === 'expensses') {
+      return this.userExtract?.fixedExpensess.some(expensse => !expensse.active) || false;
+    }
+    if (ItensToSearch === 'revenues') {
+      return this.userExtract?.revenues.some(revenue => !revenue.active) || false;
+    }
+    if (ItensToSearch === 'carsExpensses') {
+      return this.userExtract?.cardExpensess.some(cardExpensse => !cardExpensse.active) || false;
+    }
+    return false;
+  }
+
+  hasReferenceDatePresente(): boolean {
+    return formatDateToAmericanFormat(new Date()) === formatDateToAmericanFormat(this.referenceDate);
+  }
+
   onCategorySelection(event: MatSelectChange): void {
     if (event.value === 'add') {
       this.showCategoryModal = true;

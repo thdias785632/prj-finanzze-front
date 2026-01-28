@@ -152,6 +152,15 @@ mat-icon {
 
 .balance {
   color: $blue-500;
+
+  span {
+    font-size: 14px;
+    color: #718EBF;
+  }
+
+  h2 {
+    margin-top: 8px
+  }
 }
 
 .balance-container {
@@ -374,4 +383,8 @@ mat-icon {
     color: $primary-light;
     margin-left: 4px;
   }
+}
+
+.inactive {
+  opacity: 0.5;
 }

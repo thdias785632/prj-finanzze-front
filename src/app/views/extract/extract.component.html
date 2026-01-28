@@ -34,11 +34,11 @@
                         <mat-icon (click)="toggleOpenExpenssesModal()">add</mat-icon>
                     </div>
                     <div *ngFor="let expense of userExtract.fixedExpensess" class="expenses-item">
-                        <p>R$ {{ expense.value | number: '1.2-2' }}</p>
+                        <p [class.inactive]="!expense.active && hasReferenceDatePresente()">R$ {{ expense.value | number: '1.2-2' }} <span *ngIf="!expense.active && hasReferenceDatePresente()">*</span></p>
                         <h2>{{expense.name}}</h2>
                         <div class="extract-table-actions">
                             <mat-icon (click)="toggleExpenssesDeleteModal(expense)">delete</mat-icon>
-                            <!-- <mat-icon (click)="openExpenssesEditModal(expense)">edit</mat-icon> -->
+                            <mat-icon (click)="openExpenssesEditModal(expense)">edit</mat-icon>
                         </div>
                     </div>
 
@@ -51,6 +51,7 @@
                     <hr/>
                 
                     <div class="balance">
+                        <span *ngIf="hasInactiveItems('expensses') && hasReferenceDatePresente()">* Inválido para esse mês</span>
                         <h2>Total</h2>
                         <p>R$ {{ userExtract.totalExpensess | number: '1.2-2' }}</p>
                     </div>
@@ -157,7 +158,7 @@
             </mat-form-field>
 
             <div *ngIf="editExpenssesMode">
-                <label>Válido para o mês atual?:</label>
+                <label>Válido para o mês atual ({{ referenceDate | date:'MMM/yyyy' }})?:</label>
                 <mat-radio-group formControlName="active" name="active">
                     <mat-radio-button [value]="true">Sim</mat-radio-button>
                     <mat-radio-button [value]="false">Não</mat-radio-button>
