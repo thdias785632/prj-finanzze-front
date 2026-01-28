@@ -45,6 +45,8 @@ export class DashboardComponent implements OnInit {
     cardsExtract: CardsExtract[] = [];
     categoriesGrouped!: {[key: string]: number};
 
+    showImage: boolean = false;
+
     constructor(
         private userService: UserGateway,
         private cardService: CardGateway,
@@ -72,6 +74,8 @@ export class DashboardComponent implements OnInit {
                     this.groupCategories();
                     
                     this.isLoading = false;
+
+                    this.showImage = true;
                 },
                 () => {
                     this.isLoading = false;
