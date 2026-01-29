@@ -75,6 +75,7 @@ export class ExtractComponent implements OnInit {
   revenueForm!: FormGroup;
   expenssesForm!: FormGroup;
   expenssesEditForm!: FormGroup;
+  cardExpenssesEditForm!: FormGroup;
   cardExpenssesForm!: FormGroup;
   categoryForm!: FormGroup;
   
@@ -101,8 +102,6 @@ export class ExtractComponent implements OnInit {
     this.buildForm();
 
     this.getUserExtract();
-
-    this.getCategories();
   }
 
   buildForm(): void {
@@ -149,14 +148,13 @@ export class ExtractComponent implements OnInit {
         (expenses) => {
           this.userExtract = expenses;
 
-          this.groupCategories();
-          
-          this.isLoading = false;
+          this.getCategories();
         },
         (error: any) => {
-          this.isLoading = false;
-
           this.notificationService.showMessage(`${error.message}`, 'error');
+        },
+        () => { 
+          this.isLoading = false; 
         }
       );
     }
@@ -169,12 +167,15 @@ export class ExtractComponent implements OnInit {
       this.categoriesService.getCategoriesByUserId(this.user.id).subscribe(
         (data) => {
           this.categories = data;
-          this.isLoading = false;
+
+          this.groupCategories();
         },
         (error: any) => {
-          this.isLoading = false;
 
           this.notificationService.showMessage(`${error.message}`, 'error');
+        },
+        () => { 
+          this.isLoading = false; 
         }
       );
     }
@@ -314,6 +315,8 @@ export class ExtractComponent implements OnInit {
   }
 
   openExpenssesEditModal(expenssesItem: Itens): void {
+    this.toggleOpenExpenssesModal()
+    
     this.expenssesEditForm = this.formBuilder.group({
       id: new FormControl(expenssesItem.id),
       referenceDate: new FormControl(formatDateToAmericanFormat(new Date(expenssesItem.referenceDate)), [Validators.required]),
@@ -327,6 +330,26 @@ export class ExtractComponent implements OnInit {
     this.editExpenssesMode = true;
     this.showExpensses = true;
     this.showExpenssesModal = true;
+  }
+
+  openCardExpenssesEditModal(cardExpenssesItem: Itens): void {
+    this.toggleOpenExpenssesModal();
+
+    this.cardExpenssesEditForm = this.formBuilder.group({
+      id: new FormControl(cardExpenssesItem.id),
+      cardId: new FormControl(cardExpenssesItem.cardId, [Validators.required]),
+      name: new FormControl(cardExpenssesItem.name, [Validators.required]),
+      value: new FormControl(cardExpenssesItem.value, [Validators.required]),
+      installments: new FormControl(cardExpenssesItem.installment || 0, [Validators.min(0)]),
+      referenceDate: new FormControl(formatDateToAmericanFormat(new Date(cardExpenssesItem.referenceDate)), [Validators.required]),
+      active: new FormControl(cardExpenssesItem.active),
+      recurrent: new FormControl(cardExpenssesItem.recurrent),
+      category: new FormControl(cardExpenssesItem.category, [Validators.required]),
+    });
+
+    this.editExpenssesMode = true;
+    this.showExpenssesModal = true;
+    this.showCardExtractModal = false;
   }
 
   onAddRevenue(): void {
@@ -454,7 +477,7 @@ export class ExtractComponent implements OnInit {
           
           this.notificationService.showMessage('Despesa atualizada com sucesso', 'success');
           },
-          (error) => {
+          (error: any) => {
           this.isLoading = false;
           
           this.notificationService.showMessage(`${error.message}`, 'error');
@@ -503,6 +526,57 @@ export class ExtractComponent implements OnInit {
           this.notificationService.showMessage('Despesa cadastrada com sucesso', 'success');
           },
           (error) => {
+          this.isLoading = false;
+          
+          this.notificationService.showMessage(`${error.message}`, 'error');
+        }
+      );
+
+      return;
+    }
+
+    this.notificationService.showMessage('Preencha todos os campos corretamente', 'error');
+  }
+
+  onEditCardExpensses(): void {
+    if (this.cardExpenssesEditForm.valid) {
+      this.isLoading = true;
+    
+      const formData = this.cardExpenssesEditForm.value;
+
+      const cardExpensses: CardExpensses = {
+        id: formData.id,
+        userId: this.user!.id,
+        referenceDate: new Date(formData.referenceDate),
+        name: formData.name,
+        value: formData.value,
+        category: formData.category,
+        active: !!formData.active,
+        recurrent: !!formData.recurrent,
+        cardId: formData.cardId,
+        installments: formData.installments || 0,
+      };
+
+      this.cardService.updateCardEspensses(cardExpensses).subscribe(
+          () => {
+          this.getUserExtract();
+
+          this.editExpenssesMode = false;
+          this.showExpensses = false;
+          this.showExpenssesModal = false;
+
+          this.cardExpenssesEditForm.reset();
+
+          this.cardExpenssesEditForm.patchValue({
+            referenceDate: formatDateToAmericanFormat(this.referenceDate),
+            active: true,
+            recurrent: false,
+            value: 0
+          });
+          
+          this.notificationService.showMessage('Despesa atualizada com sucesso', 'success');
+          },
+          (error: any) => {
           this.isLoading = false;
           
           this.notificationService.showMessage(`${error.message}`, 'error');

@@ -185,37 +185,3 @@ h3 {
     }
   }
 }
-
-.initial-image {
-  display: flex;
-  flex-direction: column;
-  justify-content: start;
-  align-items: center;
-  width: 82%;
-  height: 50%;
-  top: 28px;
-  left: 5%;
-  position: absolute;
-  z-index: 1000;
-  padding: 16px;
-  background-color: #ffffff;
-  border-radius: 6px;
-
-  div {
-    width: 100%;
-    display: flex;
-    justify-content: end;
-    align-items: center;
-
-    mat-icon {
-      cursor: pointer;
-    }
-  }
-
-  img {
-    padding-top: 8px;
-    width: 80%;
-    height: 90%;
-    border-radius: 12px;
-  }
-}

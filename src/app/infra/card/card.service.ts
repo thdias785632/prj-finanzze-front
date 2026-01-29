@@ -21,6 +21,12 @@ export class CardService implements CardGateway {
     );
   }
 
+  updateCardEspensses(cardExpensess: CardExpensses): Observable<void> {
+    return this.httpServer.put<void>(
+      `${this.apiUrl}/card-expenses`, cardExpensess
+    );
+  }
+
   deleteCardExpensses(id: string): Observable<void> {
     return this.httpServer.delete<void>(
       `${this.apiUrl}/card-expenses/?id=${id}`, {});

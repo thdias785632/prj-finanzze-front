@@ -179,7 +179,7 @@
             </div>
         </form>
 
-        <form *ngIf="!showExpensses && cards.length > 0" [formGroup]="cardExpenssesForm" (ngSubmit)="onAddCardExpensses()">
+        <form *ngIf="!showExpensses && cards.length > 0" [formGroup]="editExpenssesMode ? cardExpenssesEditForm : cardExpenssesForm" (ngSubmit)="editExpenssesMode ? onEditCardExpensses() : onAddCardExpensses()">
             <mat-form-field appearance="outline">
                 <mat-label>Selecione o Cartão</mat-label>
                 <mat-select formControlName="cardId" name="cardId">
@@ -218,6 +218,14 @@
                 <mat-label>Parcelas</mat-label>
                 <input matInput type="number" formControlName="installments" name="installments">
             </mat-form-field>
+
+            <div *ngIf="editExpenssesMode">
+                <label>Válido para o mês atual ({{ referenceDate | date:'MMM/yyyy' }})?:</label>
+                <mat-radio-group formControlName="active" name="active">
+                    <mat-radio-button [value]="true">Sim</mat-radio-button>
+                    <mat-radio-button [value]="false">Não</mat-radio-button>
+                </mat-radio-group>
+            </div>
             
             <div>
                 <label>Recorrente:</label>
@@ -228,7 +236,7 @@
             </div>
     
             <div class="revenue-buttons">
-                <button class="save" type="submit">Cadastrar</button>
+                <button class="save" type="submit">{{ editExpenssesMode ? 'Editar' : 'Cadastrar' }}</button>
                 <button class="cancel" type="button" (click)="toggleOpenExpenssesModal()">Cancelar</button>
             </div>
         </form>
@@ -286,17 +294,24 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let item of userExtract.cardExpensess">
-                        <td>{{ item.name }}</td>
+                    <tr *ngFor="let item of userExtract.cardExpensess" [class.inactive]="!item.active && hasReferenceDatePresente()">
+                        <td>{{ item.name }}<span *ngIf="!item.active && hasReferenceDatePresente()">*</span></td>
                         <td>{{ item.value | number: '1.2-2' }}</td>
                         <td>{{ item.category }}</td>
                         <td class="extract-table-actions">
                             <mat-icon (click)="toggleCardExpenssesDeleteModal(item)">delete</mat-icon>
-                            <!-- <mat-icon (click)="toggleCardExpenssesDeleteModal(item)">edit</mat-icon> -->
+                            <mat-icon (click)="openCardExpenssesEditModal(item)">edit</mat-icon>
                         </td>
                     </tr>
                 </tbody>
+                <tfoot>
+                    <span *ngIf="hasInactiveItems('expensses') && hasReferenceDatePresente()">* Inválido para esse mês</span>
+                </tfoot>
             </table>
+
+            <div *ngIf="!userExtract.cardExpensess || userExtract.cardExpensess.length === 0" class="no-data">
+                <p>Não há despesas de cartão cadastradas para o mês selecionado.</p>
+            </div>
         </div>
     </div>
 </div>

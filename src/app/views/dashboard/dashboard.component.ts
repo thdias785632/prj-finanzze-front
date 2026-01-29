@@ -45,8 +45,6 @@ export class DashboardComponent implements OnInit {
     cardsExtract: CardsExtract[] = [];
     categoriesGrouped!: {[key: string]: number};
 
-    showImage: boolean = false;
-
     constructor(
         private userService: UserGateway,
         private cardService: CardGateway,
@@ -57,7 +55,7 @@ export class DashboardComponent implements OnInit {
         this.user = this.userService.getUser();
 
         this.getUserExtract();
-
+        
         this.getCards();
     }
 
@@ -70,12 +68,11 @@ export class DashboardComponent implements OnInit {
             this.userService.getUserExtract(this.user.id, formattedDate).subscribe(
                 (expenses) => {
                     this.userExtract = expenses;
-                    
-                    this.groupCategories();
-                    
-                    this.isLoading = false;
 
-                    this.showImage = true;
+                    this.groupCategories();
+                },
+                (error: any) => {
+                    this.notificationService.showMessage(`${error.message}`, 'error');
                 },
                 () => {
                     this.isLoading = false;
@@ -85,22 +82,16 @@ export class DashboardComponent implements OnInit {
     }
 
     getCards(): void {
-        this.isLoading = true;
-
         const formattedDate = formatDateToAmericanFormat(this.referenceDate);
         
-        this.cardService.getCardsExtract(this.user!.id, formattedDate).subscribe({
-        next: (cards) => {
-            this.cardsExtract = cards;
-
-            this.isLoading = false;
-        },
-        error: (error) => {
-            this.notificationService.showMessage(error.message, 'error');
-            
-            this.isLoading = false;
-        }
-        });
+        this.cardService.getCardsExtract(this.user!.id, formattedDate).subscribe(
+            (cards) => {
+                this.cardsExtract = cards;
+            },
+            (error) => {
+                this.notificationService.showMessage(error.message, 'error');
+            }
+        );
     }
 
     groupCategories(): void {

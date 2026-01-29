@@ -308,6 +308,7 @@ mat-icon {
 }
 
 .extract-table {
+  overflow-y: hidden;
     overflow-x: scroll;
 
     table {
@@ -387,4 +388,13 @@ mat-icon {
 
 .inactive {
   opacity: 0.5;
+}
+
+tfoot {
+  span {
+    padding: 4px 0px;
+    width: 100%;
+    font-size: 12px;
+    color: #718EBF;
+  }
 }

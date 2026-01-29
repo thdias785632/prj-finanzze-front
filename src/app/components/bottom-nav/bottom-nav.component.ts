@@ -25,10 +25,6 @@ interface NavRoute {
   ],
 })
 export class BottomNavComponent implements OnInit {
-  /**
-   * Rotas da bottom navigation
-   * Ícones do Material Icons: https://fonts.google.com/icons
-   */
   routes: NavRoute[] = [
     {
       path: '/dashboard',
@@ -47,30 +43,11 @@ export class BottomNavComponent implements OnInit {
       label: 'Cartões',
       icon: 'credit_card',
       exact: false
-    },
-    // Adicione mais rotas conforme necessário
-    // Exemplos de ícones úteis:
-    // - analytics (Análises)
-    // - account_balance_wallet (Carteira)
-    // - savings (Investimentos)
-    // - settings (Configurações)
+    }
   ];
 
   constructor(private router: Router) {}
 
   ngOnInit(): void {
-    // Inicialização se necessário
-  }
-
-  /**
-   * Callback ao clicar em uma rota
-   * Útil para analytics ou lógica adicional
-   */
-  onRouteClick(route: NavRoute): void {
-    // Você pode adicionar analytics aqui
-    console.log(`Navegando para: ${route.label}`);
-    
-    // Exemplo de tracking (remova se não usar analytics):
-    // this.analytics.track('bottom_nav_click', { route: route.path });
   }
 }
