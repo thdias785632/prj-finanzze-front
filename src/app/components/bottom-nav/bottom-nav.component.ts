@@ -43,6 +43,12 @@ export class BottomNavComponent implements OnInit {
       label: 'Cartões',
       icon: 'credit_card',
       exact: false
+    },
+    {
+      path: '/investimento',
+      label: 'Investimentos',
+      icon: 'trending_up',
+      exact: false
     }
   ];
 

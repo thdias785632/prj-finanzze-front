@@ -1,0 +1,264 @@
+<app-notification></app-notification>
+<app-loader [isLoading]="isLoading"></app-loader>
+
+<div class="container main-content">
+  <section>
+
+    <!-- HEADER -->
+    <div class="page-header">
+      <h1>Investimentos</h1>
+      <div class="header-actions">
+        <button (click)="showAporteModal = true">Simular Aporte</button>
+        <button (click)="showCategoriaModal = true">+ Categoria</button>
+        <button (click)="showInvestimentoModal = true; editInvestimentoMode = false">+ Ativo</button>
+      </div>
+    </div>
+
+    <!-- RESUMO DA CARTEIRA -->
+    <div class="carteira-resumo" *ngIf="totalCarteira > 0">
+      <div class="resumo-item">
+        <span class="resumo-label">Valor atual</span>
+        <span class="resumo-valor">R$ {{ totalCarteira | number: '1.2-2' }}</span>
+      </div>
+      <!-- <div class="resumo-item" *ngIf="totalInvestidoCarteira > 0">
+        <span class="resumo-label">Total investido</span>
+        <span class="resumo-valor">R$ {{ totalInvestidoCarteira | number: '1.2-2' }}</span>
+      </div> -->
+      <div class="resumo-item" *ngIf="totalInvestidoCarteira > 0">
+        <span class="resumo-label">Resultado</span>
+        <span class="resumo-valor ganho-loss" [class.positivo]="ganhoLossCarteira >= 0" [class.negativo]="ganhoLossCarteira < 0">
+          {{ ganhoLossCarteira >= 0 ? '+' : '' }}R$ {{ ganhoLossCarteira | number: '1.2-2' }}
+        </span>
+      </div>
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div class="empty-state" *ngIf="carteira.length === 0 && !isLoading">
+      <p>Nenhuma categoria cadastrada. Comece adicionando uma categoria e seus ativos.</p>
+    </div>
+
+    <!-- CATEGORIAS E ATIVOS -->
+    <div class="categoria-card" *ngFor="let categoria of carteira">
+      <div class="categoria-header">
+        <div class="categoria-info">
+          <h2>{{ categoria.name }}</h2>
+          <div class="categoria-stats">
+            <span class="tag">Meta: {{ categoria.targetPercentage | number: '1.1-1' }}%</span>
+            <span class="tag atual"
+              [class.acima]="categoria.percentualNaCarteira > categoria.targetPercentage"
+              [class.abaixo]="categoria.percentualNaCarteira < categoria.targetPercentage">
+              Atual: {{ categoria.percentualNaCarteira | number: '1.1-1' }}%
+            </span>
+          </div>
+        </div>
+        <div class="categoria-actions">
+          <span class="categoria-total">R$ {{ categoria.totalCategoria | number: '1.2-2' }}</span>
+          <mat-icon (click)="toggleDeleteCategoriaModal(categoria)">delete</mat-icon>
+        </div>
+      </div>
+
+      <!-- PROGRESS BAR -->
+      <div class="progress-bar-container">
+        <div class="progress-bar"
+          [style.width.%]="categoria.percentualNaCarteira > 100 ? 100 : categoria.percentualNaCarteira"
+          [class.acima]="categoria.percentualNaCarteira > categoria.targetPercentage">
+        </div>
+        <div class="progress-bar-meta" [style.left.%]="categoria.targetPercentage > 100 ? 100 : categoria.targetPercentage"></div>
+      </div>
+
+      <!-- ATIVOS -->
+      <div class="ativos-list" *ngIf="categoria.ativos.length > 0">
+        <div class="ativo-item" *ngFor="let ativo of categoria.ativos">
+
+          <!-- Nome e valor -->
+          <div class="ativo-header">
+            <span class="ativo-name">{{ ativo.name }}</span>
+            <span class="ativo-value">R$ {{ ativo.currentValue | number: '1.2-2' }}</span>
+          </div>
+
+          <!-- Preços (opcionais) -->
+          <div class="ativo-precos" *ngIf="ativo.averagePrice || ativo.currentPrice">
+            <span class="preco-tag" *ngIf="ativo.quantity">
+              Qtd: {{ ativo.quantity | number: '1.0-4' }}
+            </span>
+            <span class="preco-tag" *ngIf="ativo.averagePrice">
+              PM: R$ {{ ativo.averagePrice | number: '1.2-2' }}
+            </span>
+            <span class="preco-tag" *ngIf="ativo.currentPrice">
+              Atual: R$ {{ ativo.currentPrice | number: '1.2-2' }}
+            </span>
+          </div>
+
+          <!-- Valorização (opcional) -->
+          <div class="ativo-valorizacao" *ngIf="ativo.ganhoLoss !== undefined">
+            <span class="valorizacao-badge" [class.positivo]="ativo.ganhoLoss! >= 0" [class.negativo]="ativo.ganhoLoss! < 0">
+              {{ ativo.ganhoLoss! >= 0 ? '+' : '' }}R$ {{ ativo.ganhoLoss! | number: '1.2-2' }}
+              ({{ ativo.valorizacaoPct! >= 0 ? '+' : '' }}{{ ativo.valorizacaoPct! | number: '1.2-2' }}%)
+            </span>
+          </div>
+
+          <!-- Percentuais e ações -->
+          <div class="ativo-footer">
+            <div class="ativo-percentuais">
+              <span class="pct-tag">{{ ativo.percentualNaCategoria | number: '1.1-1' }}% na categ.</span>
+              <span class="pct-tag">{{ ativo.percentualNaCarteira | number: '1.1-1' }}% carteira</span>
+              <span class="pct-tag meta">Meta: {{ ativo.targetPercentage | number: '1.1-1' }}%</span>
+            </div>
+            <div class="ativo-actions">
+              <mat-icon (click)="openEditInvestimento(ativo)">edit</mat-icon>
+              <mat-icon (click)="toggleDeleteInvestimentoModal(ativo)">delete</mat-icon>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="no-ativos" *ngIf="categoria.ativos.length === 0">
+        <span>Nenhum ativo nesta categoria.</span>
+      </div>
+    </div>
+
+  </section>
+</div>
+
+<!-- MODAL: NOVA CATEGORIA -->
+<div class="modal" *ngIf="showCategoriaModal">
+  <div class="modal-content">
+    <h2>Nova Categoria</h2>
+    <form [formGroup]="categoriaForm">
+      <mat-form-field appearance="outline">
+        <mat-label>Nome da categoria</mat-label>
+        <input matInput formControlName="name" placeholder="Ex: Renda Fixa" />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>% ideal na carteira</mat-label>
+        <input matInput type="number" formControlName="targetPercentage" min="0" max="100" />
+      </mat-form-field>
+    </form>
+    <div class="revenue-buttons">
+      <button class="cancel" (click)="showCategoriaModal = false; categoriaForm.reset()">Cancelar</button>
+      <button (click)="onAddCategoria()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: NOVO/EDITAR ATIVO -->
+<div class="modal" *ngIf="showInvestimentoModal">
+  <div class="modal-content">
+    <h2>{{ editInvestimentoMode ? 'Editar Ativo' : 'Novo Ativo' }}</h2>
+    <form [formGroup]="investimentoForm">
+
+      <mat-form-field appearance="outline">
+        <mat-label>Categoria</mat-label>
+        <mat-select formControlName="categoriaId">
+          <mat-option *ngFor="let cat of categorias" [value]="cat.id">{{ cat.name }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Nome do ativo (ex: PETR4)</mat-label>
+        <input matInput formControlName="name" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>% ideal na categoria</mat-label>
+        <input matInput type="number" formControlName="targetPercentage" min="0" max="100" />
+      </mat-form-field>
+
+      <p class="secao-label">Preços e quantidade <span>(opcional)</span></p>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Quantidade</mat-label>
+          <input matInput type="number" formControlName="quantity" min="0" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Preço médio (R$)</mat-label>
+          <input matInput type="number" formControlName="averagePrice" min="0" />
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Preço atual (R$)</mat-label>
+          <input matInput type="number" formControlName="currentPrice" min="0" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Valor total (R$)</mat-label>
+          <input matInput type="number" formControlName="currentValue" min="0" />
+        </mat-form-field>
+      </div>
+
+    </form>
+    <div class="revenue-buttons">
+      <button class="cancel" (click)="closeInvestimentoModal()">Cancelar</button>
+      <button (click)="onAddInvestimento()">{{ editInvestimentoMode ? 'Atualizar' : 'Salvar' }}</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: SIMULAR APORTE -->
+<div class="modal" *ngIf="showAporteModal">
+  <div class="modal-content modal-aporte">
+    <h2>Simular Aporte</h2>
+
+    <form [formGroup]="aporteForm">
+      <mat-form-field appearance="outline">
+        <mat-label>Valor do aporte (R$)</mat-label>
+        <input matInput type="number" formControlName="valorAporte" min="0.01" />
+      </mat-form-field>
+    </form>
+
+    <div class="revenue-buttons">
+      <button class="cancel" (click)="showAporteModal = false; aporteRecomendacoes = []">Fechar</button>
+      <button (click)="calcularAporte()">Calcular</button>
+    </div>
+
+    <div class="aporte-resultado" *ngIf="aporteRecomendacoes.length > 0">
+      <hr />
+      <h2>Recomendação de alocação</h2>
+      <div class="aporte-categoria" *ngFor="let rec of aporteRecomendacoes">
+        <div class="aporte-categoria-header">
+          <span class="aporte-cat-nome">{{ rec.categoriaNome }}</span>
+          <span class="aporte-cat-valor">R$ {{ rec.valorRecomendado | number: '1.2-2' }}</span>
+        </div>
+        <div class="aporte-ativo" *ngFor="let ativo of rec.ativos">
+          <div class="aporte-ativo-info">
+            <span class="aporte-ativo-nome">{{ ativo.ativoNome }}</span>
+            <span *ngIf="ativo.currentPrice" class="aporte-ativo-preco">R$ {{ ativo.currentPrice | number: '1.2-2' }}/un</span>
+          </div>
+          <div class="aporte-ativo-valores">
+            <span class="aporte-valor">R$ {{ ativo.valorRecomendado | number: '1.2-2' }}</span>
+            <span class="aporte-qtd" *ngIf="ativo.quantidadeRecomendada">
+              ≈ {{ ativo.quantidadeRecomendada | number: '1.0-4' }} cotas
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: DELETAR CATEGORIA -->
+<div class="modal" *ngIf="showDeleteCategoriaModal">
+  <div class="modal-content">
+    <h2>Remover Categoria</h2>
+    <p>Tem certeza que deseja remover a categoria <strong>{{ categoriaToDelete?.name }}</strong>?</p>
+    <div class="revenue-buttons">
+      <button class="cancel" (click)="toggleDeleteCategoriaModal()">Cancelar</button>
+      <button class="danger" (click)="onRemoveCategoria()">Remover</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: DELETAR ATIVO -->
+<div class="modal" *ngIf="showDeleteInvestimentoModal">
+  <div class="modal-content">
+    <h2>Remover Ativo</h2>
+    <p>Tem certeza que deseja remover o ativo <strong>{{ investimentoToDelete?.name }}</strong>?</p>
+    <div class="revenue-buttons">
+      <button class="cancel" (click)="toggleDeleteInvestimentoModal()">Cancelar</button>
+      <button class="danger" (click)="onRemoveInvestimento()">Remover</button>
+    </div>
+  </div>
+</div>
