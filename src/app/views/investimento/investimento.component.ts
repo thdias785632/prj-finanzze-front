@@ -7,10 +7,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { RouterModule } from '@angular/router';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { UserGateway } from '../../domain/user/gateway/user.gateway';
 import { UserService } from '../../infra/user/user.service';
 import { InvestimentoGateway } from '../../domain/investimento/gateway/investimento.gateway';
 import { InvestimentoService } from '../../infra/investimento/investimento.service';
+import { PriceGateway } from '../../domain/price/gateway/price.gateway';
+import { PriceService } from '../../infra/price/price.service';
 import { NotificationService } from '../../infra/notification/notification.service';
 import { LoaderComponent } from '../../components/loader/loader.component';
 import { NotificationComponent } from '../../components/notification/notification.component';
@@ -22,6 +26,7 @@ import {
   InvestimentoComCalculo,
   AporteRecomendacao
 } from '../../domain/investimento/dto/investimento.dto';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-investimento',
@@ -43,6 +48,7 @@ import {
   providers: [
     { provide: UserGateway, useClass: UserService },
     { provide: InvestimentoGateway, useClass: InvestimentoService },
+    { provide: PriceGateway, useClass: PriceService },
     { provide: NotificationService, useClass: NotificationService },
   ]
 })
@@ -62,27 +68,33 @@ export class InvestimentoComponent implements OnInit {
   showAporteModal = false;
   showDeleteCategoriaModal = false;
   showDeleteInvestimentoModal = false;
+  showTokenModal = false;
 
   editInvestimentoMode = false;
 
   categoriaForm!: FormGroup;
   investimentoForm!: FormGroup;
   aporteForm!: FormGroup;
+  tokenForm!: FormGroup;
 
   categoriaToDelete: CategoriaInvestimento | undefined;
   investimentoToDelete: Investimento | undefined;
   aporteRecomendacoes: AporteRecomendacao[] = [];
 
+  hasBrapiToken = false;
+
   constructor(
     private formBuilder: FormBuilder,
     private userService: UserGateway,
     private investimentoService: InvestimentoGateway,
+    private priceService: PriceGateway,
     private notificationService: NotificationService,
   ) {}
 
   ngOnInit(): void {
     this.user = this.userService.getUser();
     this.buildForms();
+    this.hasBrapiToken = !!environment.tokenBravi
     this.loadData();
   }
 
@@ -107,7 +119,6 @@ export class InvestimentoComponent implements OnInit {
       valorAporte: new FormControl(0, [Validators.required, Validators.min(0.01)]),
     });
 
-    // Auto-calcula currentValue quando quantity e currentPrice são preenchidos
     this.investimentoForm.get('quantity')?.valueChanges.subscribe(() => this.autoCalcCurrentValue());
     this.investimentoForm.get('currentPrice')?.valueChanges.subscribe(() => this.autoCalcCurrentValue());
   }
@@ -131,8 +142,9 @@ export class InvestimentoComponent implements OnInit {
 
         this.investimentoService.getInvestimentosByUserId(this.user!.id).subscribe({
           next: (investimentos) => {
-            this.investimentos = investimentos;
+            this.investimentos = investimentos.sort((a, b) => b.currentValue - a.currentValue);
             this.calcularCarteira();
+
             this.isLoading = false;
           },
           error: (error) => {
@@ -151,7 +163,6 @@ export class InvestimentoComponent implements OnInit {
   calcularCarteira(): void {
     this.totalCarteira = this.investimentos.reduce((sum, inv) => sum + inv.currentValue, 0);
 
-    // Totais de valorização para o resumo geral
     let totalInvestido = 0;
     let totalAtual = 0;
     let temValorizacao = false;
@@ -168,7 +179,6 @@ export class InvestimentoComponent implements OnInit {
           percentualNaCarteira: this.totalCarteira > 0 ? (inv.currentValue / this.totalCarteira) * 100 : 0,
         };
 
-        // Valorização: só calcula se tiver quantidade e ambos os preços
         if (inv.quantity && inv.averagePrice && inv.currentPrice) {
           const totalInv = inv.quantity * inv.averagePrice;
           const valorAtual = inv.quantity * inv.currentPrice;
@@ -208,21 +218,87 @@ export class InvestimentoComponent implements OnInit {
       return;
     }
 
-    const valorAporte: number = this.aporteForm.value.valorAporte;
+    const valorAporte: number = Number(this.aporteForm.value.valorAporte);
+    const totalAtual = this.totalCarteira;
+    const totalNovo = totalAtual + valorAporte;
+
+    type CatInfo = {
+      cat: CategoriaComCalculo;
+      deficit: number;
+    };
+
+    const catInfos: CatInfo[] = this.carteira.map((cat) => {
+      const alvo = totalNovo * (cat.targetPercentage / 100);
+      const deficit = Math.max(0, alvo - cat.totalCategoria);
+      return { cat, deficit };
+    });
+
+    const somaDeficits = catInfos.reduce((s, c) => s + c.deficit, 0);
+    const somaTargetsCat = this.carteira.reduce((s, c) => s + (c.targetPercentage || 0), 0);
+
+    const alocacaoCategoria = new Map<string, number>();
+
+    if (valorAporte <= 0) {
+      for (const c of catInfos) alocacaoCategoria.set(c.cat.id!, 0);
+    } else if (somaDeficits >= valorAporte) {
+      // Aporte insuficiente para cobrir déficits: rateia pelos déficits
+      for (const c of catInfos) {
+        const valor = somaDeficits > 0 ? valorAporte * (c.deficit / somaDeficits) : 0;
+        alocacaoCategoria.set(c.cat.id!, valor);
+      }
+    } else {
+      // Cobre déficits e distribui o excedente proporcional ao target
+      const excesso = valorAporte - somaDeficits;
+      for (const c of catInfos) {
+        const extra =
+          somaTargetsCat > 0 ? excesso * ((c.cat.targetPercentage || 0) / somaTargetsCat) : 0;
+        alocacaoCategoria.set(c.cat.id!, c.deficit + extra);
+      }
+    }
 
     this.aporteRecomendacoes = this.carteira.map((cat) => {
-      const valorCategoria = valorAporte * (cat.targetPercentage / 100);
+      const valorCategoria = alocacaoCategoria.get(cat.id!) ?? 0;
+      const totalNovoCategoria = cat.totalCategoria + valorCategoria;
 
-      const ativos = cat.ativos.map((ativo) => {
-        const valorRecomendado = valorCategoria * (ativo.targetPercentage / 100);
+      type AtivoInfo = {
+        ativo: InvestimentoComCalculo;
+        deficit: number;
+      };
+
+      const ativoInfos: AtivoInfo[] = cat.ativos.map((ativo) => {
+        const alvoAtivo = totalNovoCategoria * ((ativo.targetPercentage || 0) / 100);
+        const deficitAtivo = Math.max(0, alvoAtivo - ativo.currentValue);
+        return { ativo, deficit: deficitAtivo };
+      });
+
+      const somaDeficitsAtivos = ativoInfos.reduce((s, a) => s + a.deficit, 0);
+      const somaTargetsAtivos = cat.ativos.reduce((s, a) => s + (a.targetPercentage || 0), 0);
+
+      const ativos = ativoInfos.map(({ ativo, deficit }) => {
+        let valorRecomendado = 0;
+        if (valorCategoria <= 0) {
+          valorRecomendado = 0;
+        } else if (somaDeficitsAtivos >= valorCategoria) {
+          valorRecomendado =
+            somaDeficitsAtivos > 0 ? valorCategoria * (deficit / somaDeficitsAtivos) : 0;
+        } else {
+          const excessoAtivo = valorCategoria - somaDeficitsAtivos;
+          const extra =
+            somaTargetsAtivos > 0
+              ? excessoAtivo * ((ativo.targetPercentage || 0) / somaTargetsAtivos)
+              : 0;
+          valorRecomendado = deficit + extra;
+        }
+
         return {
           ativoId: ativo.id!,
           ativoNome: ativo.name,
           valorRecomendado,
           currentPrice: ativo.currentPrice,
-          quantidadeRecomendada: ativo.currentPrice && ativo.currentPrice > 0
-            ? valorRecomendado / ativo.currentPrice
-            : undefined,
+          quantidadeRecomendada:
+            ativo.currentPrice && ativo.currentPrice > 0
+              ? valorRecomendado / ativo.currentPrice
+              : undefined,
         };
       });
 
@@ -232,6 +308,81 @@ export class InvestimentoComponent implements OnInit {
         valorRecomendado: valorCategoria,
         ativos,
       };
+    });
+  }
+
+  atualizarPrecosManual(): void {
+    const ativosComTicker = this.investimentos.filter((i) => !!i.quantity && i.quantity > 0 && !!i.name);
+
+    if (ativosComTicker.length === 0) {
+      this.notificationService.showMessage(
+        'Cadastre quantidade e um ticker válido nos ativos para buscar cotações automaticamente.',
+        'error',
+      );
+      return;
+    }
+
+    this.isLoading = true;
+    
+    this.priceService.getPrices(ativosComTicker.map((i) => i.name)).subscribe({
+      next: (precos) => {
+        const atualizados: Investimento[] = [];
+
+        const falharam: string[] = [];
+        
+        for (const inv of this.investimentos) {
+          const cot = precos[inv.name?.toUpperCase?.() ?? ''];
+        
+          if (cot && inv.quantity && inv.quantity > 0) {
+            inv.currentPrice = cot.price;
+            inv.currentValue = inv.quantity * cot.price;
+            atualizados.push(inv);
+          } else if (inv.quantity && inv.quantity > 0) {
+            falharam.push(inv.name);
+          }
+        }
+
+        this.calcularCarteira();
+
+        if (atualizados.length === 0) {
+          this.isLoading = false;
+          const msg = !this.hasBrapiToken
+            ? 'Nenhum preço foi atualizado. Configure seu token da brapi para tickers brasileiros.'
+            : 'Nenhum preço foi atualizado. Verifique se os nomes dos ativos são tickers válidos.';
+          this.notificationService.showMessage(msg, 'error');
+          return;
+        }
+
+        const reqs = atualizados.map((inv) =>
+          this.investimentoService.updateInvestimento(inv).pipe(catchError(() => of(null))),
+        );
+        
+        forkJoin(reqs).subscribe({
+          next: () => {
+            this.isLoading = false;
+        
+            const sufixo = falharam.length > 0 ? ` (falhou: ${falharam.join(', ')})` : '';
+        
+            this.notificationService.showMessage(
+              `${atualizados.length} preço(s) atualizado(s) com sucesso${sufixo}`,
+              'success',
+            );
+          },
+          error: () => {
+            this.isLoading = false;
+        
+            this.notificationService.showMessage(
+              'Preços atualizados em tela, mas houve erro ao salvar.',
+              'error',
+            );
+          },
+        });
+      },
+      error: () => {
+        this.isLoading = false;
+        
+        this.notificationService.showMessage('Erro ao buscar cotações.', 'error');
+      },
     });
   }
 

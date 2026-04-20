@@ -8,6 +8,9 @@
     <div class="page-header">
       <h1>Investimentos</h1>
       <div class="header-actions">
+        <button (click)="atualizarPrecosManual()" title="Buscar cotações atuais">
+          <mat-icon class="btn-icon">refresh</mat-icon> Atualizar Carteira
+        </button>
         <button (click)="showAporteModal = true">Simular Aporte</button>
         <button (click)="showCategoriaModal = true">+ Categoria</button>
         <button (click)="showInvestimentoModal = true; editInvestimentoMode = false">+ Ativo</button>
