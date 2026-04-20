@@ -26,6 +26,7 @@ import {
   InvestimentoComCalculo,
   AporteRecomendacao
 } from '../../domain/investimento/dto/investimento.dto';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-investimento',
@@ -93,7 +94,7 @@ export class InvestimentoComponent implements OnInit {
   ngOnInit(): void {
     this.user = this.userService.getUser();
     this.buildForms();
-    this.hasBrapiToken = !!this.priceService.getBrapiToken();
+    this.hasBrapiToken = !!environment.tokenBravi
     this.loadData();
   }
 
@@ -118,11 +119,6 @@ export class InvestimentoComponent implements OnInit {
       valorAporte: new FormControl(0, [Validators.required, Validators.min(0.01)]),
     });
 
-    this.tokenForm = this.formBuilder.group({
-      token: new FormControl(this.priceService.getBrapiToken() ?? ''),
-    });
-
-    // Auto-calcula currentValue quando quantity e currentPrice são preenchidos
     this.investimentoForm.get('quantity')?.valueChanges.subscribe(() => this.autoCalcCurrentValue());
     this.investimentoForm.get('currentPrice')?.valueChanges.subscribe(() => this.autoCalcCurrentValue());
   }
@@ -146,9 +142,10 @@ export class InvestimentoComponent implements OnInit {
 
         this.investimentoService.getInvestimentosByUserId(this.user!.id).subscribe({
           next: (investimentos) => {
-            this.investimentos = investimentos;
+            this.investimentos = investimentos.sort((a, b) => b.currentValue - a.currentValue);
             this.calcularCarteira();
-            this.atualizarPrecosAutomatico();
+
+            this.isLoading = false;
           },
           error: (error) => {
             this.isLoading = false;
@@ -163,44 +160,9 @@ export class InvestimentoComponent implements OnInit {
     });
   }
 
-  /**
-   * Busca as cotações mais recentes na API pública ao abrir a tela.
-   * Atualiza apenas em memória; o usuário pode clicar em "Salvar preços" para persistir.
-   */
-  private atualizarPrecosAutomatico(): void {
-    const tickers = this.investimentos
-      .filter((i) => !!i.quantity && i.quantity > 0 && !!i.name)
-      .map((i) => i.name);
-
-    if (tickers.length === 0) {
-      this.isLoading = false;
-      return;
-    }
-
-    this.priceService.getPrices(tickers).subscribe({
-      next: (precos) => {
-        let algum = false;
-        for (const inv of this.investimentos) {
-          const cot = precos[inv.name?.toUpperCase?.() ?? ''];
-          if (cot && inv.quantity && inv.quantity > 0) {
-            inv.currentPrice = cot.price;
-            inv.currentValue = inv.quantity * cot.price;
-            algum = true;
-          }
-        }
-        if (algum) this.calcularCarteira();
-        this.isLoading = false;
-      },
-      error: () => {
-        this.isLoading = false;
-      },
-    });
-  }
-
   calcularCarteira(): void {
     this.totalCarteira = this.investimentos.reduce((sum, inv) => sum + inv.currentValue, 0);
 
-    // Totais de valorização para o resumo geral
     let totalInvestido = 0;
     let totalAtual = 0;
     let temValorizacao = false;
@@ -217,7 +179,6 @@ export class InvestimentoComponent implements OnInit {
           percentualNaCarteira: this.totalCarteira > 0 ? (inv.currentValue / this.totalCarteira) * 100 : 0,
         };
 
-        // Valorização: só calcula se tiver quantidade e ambos os preços
         if (inv.quantity && inv.averagePrice && inv.currentPrice) {
           const totalInv = inv.quantity * inv.averagePrice;
           const valorAtual = inv.quantity * inv.currentPrice;
@@ -251,22 +212,6 @@ export class InvestimentoComponent implements OnInit {
     }
   }
 
-  /**
-   * Distribui um aporte entre categorias e ativos considerando o estado atual
-   * da carteira vs. metas definidas pelo usuário (rebalanceamento).
-   *
-   * Estratégia:
-   *  1. Calcula o total da carteira APÓS o aporte: totalNovo = totalAtual + aporte.
-   *  2. Para cada categoria, calcula o déficit em relação ao alvo:
-   *     alvo      = totalNovo * (targetCategoria / 100)
-   *     déficit   = max(0, alvo - totalAtualCategoria)
-   *  3. Se a soma dos déficits >= aporte, distribui o aporte proporcionalmente
-   *     ao déficit (foca apenas em cobrir as categorias abaixo do alvo).
-   *  4. Caso contrário, cobre todos os déficits e distribui o excedente
-   *     proporcional ao target de cada categoria (mantendo a meta a longo prazo).
-   *  5. Aplica a mesma lógica dentro da categoria para distribuir o valor
-   *     alocado entre os ativos, considerando o valor atual de cada um.
-   */
   calcularAporte(): void {
     if (this.aporteForm.invalid) {
       this.notificationService.showMessage('Informe um valor de aporte válido', 'error');
@@ -368,6 +313,7 @@ export class InvestimentoComponent implements OnInit {
 
   atualizarPrecosManual(): void {
     const ativosComTicker = this.investimentos.filter((i) => !!i.quantity && i.quantity > 0 && !!i.name);
+
     if (ativosComTicker.length === 0) {
       this.notificationService.showMessage(
         'Cadastre quantidade e um ticker válido nos ativos para buscar cotações automaticamente.',
@@ -377,12 +323,16 @@ export class InvestimentoComponent implements OnInit {
     }
 
     this.isLoading = true;
+    
     this.priceService.getPrices(ativosComTicker.map((i) => i.name)).subscribe({
       next: (precos) => {
         const atualizados: Investimento[] = [];
+
         const falharam: string[] = [];
+        
         for (const inv of this.investimentos) {
           const cot = precos[inv.name?.toUpperCase?.() ?? ''];
+        
           if (cot && inv.quantity && inv.quantity > 0) {
             inv.currentPrice = cot.price;
             inv.currentValue = inv.quantity * cot.price;
@@ -403,14 +353,16 @@ export class InvestimentoComponent implements OnInit {
           return;
         }
 
-        // Persiste no backend em paralelo
         const reqs = atualizados.map((inv) =>
           this.investimentoService.updateInvestimento(inv).pipe(catchError(() => of(null))),
         );
+        
         forkJoin(reqs).subscribe({
           next: () => {
             this.isLoading = false;
+        
             const sufixo = falharam.length > 0 ? ` (falhou: ${falharam.join(', ')})` : '';
+        
             this.notificationService.showMessage(
               `${atualizados.length} preço(s) atualizado(s) com sucesso${sufixo}`,
               'success',
@@ -418,6 +370,7 @@ export class InvestimentoComponent implements OnInit {
           },
           error: () => {
             this.isLoading = false;
+        
             this.notificationService.showMessage(
               'Preços atualizados em tela, mas houve erro ao salvar.',
               'error',
@@ -427,20 +380,10 @@ export class InvestimentoComponent implements OnInit {
       },
       error: () => {
         this.isLoading = false;
+        
         this.notificationService.showMessage('Erro ao buscar cotações.', 'error');
       },
     });
-  }
-
-  salvarToken(): void {
-    const token = (this.tokenForm.value.token ?? '').toString().trim();
-    this.priceService.setBrapiToken(token || null);
-    this.hasBrapiToken = !!token;
-    this.showTokenModal = false;
-    this.notificationService.showMessage(
-      token ? 'Token da brapi salvo com sucesso' : 'Token da brapi removido',
-      'success',
-    );
   }
 
   onAddCategoria(): void {

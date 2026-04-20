@@ -9,10 +9,7 @@
       <h1>Investimentos</h1>
       <div class="header-actions">
         <button (click)="atualizarPrecosManual()" title="Buscar cotações atuais">
-          <mat-icon class="btn-icon">refresh</mat-icon> Atualizar preços
-        </button>
-        <button (click)="showTokenModal = true" title="Configurar token brapi">
-          <mat-icon class="btn-icon">{{ hasBrapiToken ? 'vpn_key' : 'key_off' }}</mat-icon> Token
+          <mat-icon class="btn-icon">refresh</mat-icon> Atualizar Carteira
         </button>
         <button (click)="showAporteModal = true">Simular Aporte</button>
         <button (click)="showCategoriaModal = true">+ Categoria</button>
@@ -253,31 +250,6 @@
     <div class="revenue-buttons">
       <button class="cancel" (click)="toggleDeleteCategoriaModal()">Cancelar</button>
       <button class="danger" (click)="onRemoveCategoria()">Remover</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL: TOKEN BRAPI -->
-<div class="modal" *ngIf="showTokenModal">
-  <div class="modal-content">
-    <h2>Token brapi.dev</h2>
-    <p>
-      Para buscar cotações de ações e FIIs brasileiros (ex.: <strong>PETR4</strong>, <strong>HGLG11</strong>),
-      a brapi.dev exige um token gratuito.
-      Crie sua conta em
-      <a href="https://brapi.dev" target="_blank" rel="noopener">brapi.dev</a>,
-      copie seu token e cole abaixo.
-      Cotações de criptomoedas (BTC, ETH, etc.) usam CoinGecko e <em>não</em> precisam de token.
-    </p>
-    <form [formGroup]="tokenForm">
-      <mat-form-field appearance="outline">
-        <mat-label>Token brapi (opcional)</mat-label>
-        <input matInput formControlName="token" placeholder="Cole seu token aqui" />
-      </mat-form-field>
-    </form>
-    <div class="revenue-buttons">
-      <button class="cancel" (click)="showTokenModal = false">Cancelar</button>
-      <button (click)="salvarToken()">Salvar</button>
     </div>
   </div>
 </div>

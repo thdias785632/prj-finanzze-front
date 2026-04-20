@@ -4,15 +4,14 @@ import { forkJoin, Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { PriceGateway } from '../../domain/price/gateway/price.gateway';
 import { CotacaoAtual } from '../../domain/price/dto/price.dto';
+import { environment } from '../../../environments/environment';
 
 const BRAPI_BASE = 'https://brapi.dev/api';
 const COINGECKO_BASE = 'https://api.coingecko.com/api/v3';
-const BRAPI_TOKEN_STORAGE_KEY = '@Finnanze:BrapiToken';
+const BRAPI_TOKEN_STORAGE_KEY = environment.tokenBravi;
 
-// Tickers que a brapi disponibiliza sem token (acesso gratuito)
 const BRAPI_FREE_TICKERS = new Set(['PETR4', 'MGLU3', 'VALE3', 'ITUB4']);
 
-// Mapa de s\u00edmbolos de cripto para IDs da CoinGecko
 const CRYPTO_SYMBOL_TO_ID: Record<string, string> = {
     BTC: 'bitcoin',
     ETH: 'ethereum',
@@ -56,26 +55,6 @@ interface BrapiResponse {
 @Injectable({ providedIn: 'root' })
 export class PriceService implements PriceGateway {
     constructor(private http: HttpClient) {}
-
-    getBrapiToken(): string | null {
-        try {
-            return localStorage.getItem(BRAPI_TOKEN_STORAGE_KEY);
-        } catch {
-            return null;
-        }
-    }
-
-    setBrapiToken(token: string | null): void {
-        try {
-            if (token && token.trim()) {
-                localStorage.setItem(BRAPI_TOKEN_STORAGE_KEY, token.trim());
-            } else {
-                localStorage.removeItem(BRAPI_TOKEN_STORAGE_KEY);
-            }
-        } catch {
-            // ignora
-        }
-    }
 
     getPrice(ticker: string): Observable<CotacaoAtual | null> {
         const normalized = this.normalizeTicker(ticker);
@@ -140,11 +119,14 @@ export class PriceService implements PriceGateway {
     }
 
     private fetchBrapi(ticker: string): Observable<CotacaoAtual | null> {
-        const token = this.getBrapiToken();
+        const token = BRAPI_TOKEN_STORAGE_KEY;
+
         const url = `${BRAPI_BASE}/quote/${encodeURIComponent(ticker)}`;
+        
         const params: Record<string, string> = {};
+        
         if (token) params['token'] = token;
-        // Se n\u00e3o houver token e o ticker n\u00e3o for free, evita a chamada
+        
         if (!token && !BRAPI_FREE_TICKERS.has(ticker)) {
             return of(null);
         }
@@ -165,7 +147,8 @@ export class PriceService implements PriceGateway {
     }
 
     private fetchBrapiBatch(tickers: string[]): Observable<Record<string, CotacaoAtual | null>> {
-        const token = this.getBrapiToken();
+        const token = BRAPI_TOKEN_STORAGE_KEY;
+
         const allowed = token ? tickers : tickers.filter((t) => BRAPI_FREE_TICKERS.has(t));
         const skipped = token ? [] : tickers.filter((t) => !BRAPI_FREE_TICKERS.has(t));
 
@@ -174,32 +157,13 @@ export class PriceService implements PriceGateway {
 
         if (allowed.length === 0) return of(base);
 
-        const url = `${BRAPI_BASE}/quote/${allowed.map(encodeURIComponent).join(',')}`;
-        const params: Record<string, string> = {};
-        if (token) params['token'] = token;
+        const perTicker = allowed.reduce<Record<string, Observable<CotacaoAtual | null>>>(
+            (acc, t) => ({ ...acc, [t]: this.fetchBrapi(t) }),
+            {},
+        );
 
-        return this.http.get<BrapiResponse>(url, { params }).pipe(
-            map((res) => {
-                const out: Record<string, CotacaoAtual | null> = { ...base };
-                const results = res?.results ?? [];
-                const bySymbol = new Map<string, (typeof results)[number]>();
-                for (const r of results) bySymbol.set(r.symbol?.toUpperCase?.() ?? '', r);
-
-                for (const t of allowed) {
-                    const r = bySymbol.get(t);
-                    if (r && typeof r.regularMarketPrice === 'number') {
-                        out[t] = {
-                            ticker: t,
-                            price: r.regularMarketPrice,
-                            source: 'brapi',
-                            currency: r.currency,
-                        };
-                    } else {
-                        out[t] = null;
-                    }
-                }
-                return out;
-            }),
+        return forkJoin(perTicker).pipe(
+            map((results) => ({ ...base, ...results })),
             catchError(() => {
                 const out: Record<string, CotacaoAtual | null> = { ...base };
                 for (const t of allowed) out[t] = null;
