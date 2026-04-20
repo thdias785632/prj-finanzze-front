@@ -7,10 +7,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { RouterModule } from '@angular/router';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { UserGateway } from '../../domain/user/gateway/user.gateway';
 import { UserService } from '../../infra/user/user.service';
 import { InvestimentoGateway } from '../../domain/investimento/gateway/investimento.gateway';
 import { InvestimentoService } from '../../infra/investimento/investimento.service';
+import { PriceGateway } from '../../domain/price/gateway/price.gateway';
+import { PriceService } from '../../infra/price/price.service';
 import { NotificationService } from '../../infra/notification/notification.service';
 import { LoaderComponent } from '../../components/loader/loader.component';
 import { NotificationComponent } from '../../components/notification/notification.component';
@@ -43,6 +47,7 @@ import {
   providers: [
     { provide: UserGateway, useClass: UserService },
     { provide: InvestimentoGateway, useClass: InvestimentoService },
+    { provide: PriceGateway, useClass: PriceService },
     { provide: NotificationService, useClass: NotificationService },
   ]
 })
@@ -62,27 +67,33 @@ export class InvestimentoComponent implements OnInit {
   showAporteModal = false;
   showDeleteCategoriaModal = false;
   showDeleteInvestimentoModal = false;
+  showTokenModal = false;
 
   editInvestimentoMode = false;
 
   categoriaForm!: FormGroup;
   investimentoForm!: FormGroup;
   aporteForm!: FormGroup;
+  tokenForm!: FormGroup;
 
   categoriaToDelete: CategoriaInvestimento | undefined;
   investimentoToDelete: Investimento | undefined;
   aporteRecomendacoes: AporteRecomendacao[] = [];
 
+  hasBrapiToken = false;
+
   constructor(
     private formBuilder: FormBuilder,
     private userService: UserGateway,
     private investimentoService: InvestimentoGateway,
+    private priceService: PriceGateway,
     private notificationService: NotificationService,
   ) {}
 
   ngOnInit(): void {
     this.user = this.userService.getUser();
     this.buildForms();
+    this.hasBrapiToken = !!this.priceService.getBrapiToken();
     this.loadData();
   }
 
@@ -105,6 +116,10 @@ export class InvestimentoComponent implements OnInit {
 
     this.aporteForm = this.formBuilder.group({
       valorAporte: new FormControl(0, [Validators.required, Validators.min(0.01)]),
+    });
+
+    this.tokenForm = this.formBuilder.group({
+      token: new FormControl(this.priceService.getBrapiToken() ?? ''),
     });
 
     // Auto-calcula currentValue quando quantity e currentPrice são preenchidos
@@ -133,7 +148,7 @@ export class InvestimentoComponent implements OnInit {
           next: (investimentos) => {
             this.investimentos = investimentos;
             this.calcularCarteira();
-            this.isLoading = false;
+            this.atualizarPrecosAutomatico();
           },
           error: (error) => {
             this.isLoading = false;
@@ -145,6 +160,40 @@ export class InvestimentoComponent implements OnInit {
         this.isLoading = false;
         this.notificationService.showMessage(error.message, 'error');
       }
+    });
+  }
+
+  /**
+   * Busca as cotações mais recentes na API pública ao abrir a tela.
+   * Atualiza apenas em memória; o usuário pode clicar em "Salvar preços" para persistir.
+   */
+  private atualizarPrecosAutomatico(): void {
+    const tickers = this.investimentos
+      .filter((i) => !!i.quantity && i.quantity > 0 && !!i.name)
+      .map((i) => i.name);
+
+    if (tickers.length === 0) {
+      this.isLoading = false;
+      return;
+    }
+
+    this.priceService.getPrices(tickers).subscribe({
+      next: (precos) => {
+        let algum = false;
+        for (const inv of this.investimentos) {
+          const cot = precos[inv.name?.toUpperCase?.() ?? ''];
+          if (cot && inv.quantity && inv.quantity > 0) {
+            inv.currentPrice = cot.price;
+            inv.currentValue = inv.quantity * cot.price;
+            algum = true;
+          }
+        }
+        if (algum) this.calcularCarteira();
+        this.isLoading = false;
+      },
+      error: () => {
+        this.isLoading = false;
+      },
     });
   }
 
@@ -202,27 +251,109 @@ export class InvestimentoComponent implements OnInit {
     }
   }
 
+  /**
+   * Distribui um aporte entre categorias e ativos considerando o estado atual
+   * da carteira vs. metas definidas pelo usuário (rebalanceamento).
+   *
+   * Estratégia:
+   *  1. Calcula o total da carteira APÓS o aporte: totalNovo = totalAtual + aporte.
+   *  2. Para cada categoria, calcula o déficit em relação ao alvo:
+   *     alvo      = totalNovo * (targetCategoria / 100)
+   *     déficit   = max(0, alvo - totalAtualCategoria)
+   *  3. Se a soma dos déficits >= aporte, distribui o aporte proporcionalmente
+   *     ao déficit (foca apenas em cobrir as categorias abaixo do alvo).
+   *  4. Caso contrário, cobre todos os déficits e distribui o excedente
+   *     proporcional ao target de cada categoria (mantendo a meta a longo prazo).
+   *  5. Aplica a mesma lógica dentro da categoria para distribuir o valor
+   *     alocado entre os ativos, considerando o valor atual de cada um.
+   */
   calcularAporte(): void {
     if (this.aporteForm.invalid) {
       this.notificationService.showMessage('Informe um valor de aporte válido', 'error');
       return;
     }
 
-    const valorAporte: number = this.aporteForm.value.valorAporte;
+    const valorAporte: number = Number(this.aporteForm.value.valorAporte);
+    const totalAtual = this.totalCarteira;
+    const totalNovo = totalAtual + valorAporte;
+
+    type CatInfo = {
+      cat: CategoriaComCalculo;
+      deficit: number;
+    };
+
+    const catInfos: CatInfo[] = this.carteira.map((cat) => {
+      const alvo = totalNovo * (cat.targetPercentage / 100);
+      const deficit = Math.max(0, alvo - cat.totalCategoria);
+      return { cat, deficit };
+    });
+
+    const somaDeficits = catInfos.reduce((s, c) => s + c.deficit, 0);
+    const somaTargetsCat = this.carteira.reduce((s, c) => s + (c.targetPercentage || 0), 0);
+
+    const alocacaoCategoria = new Map<string, number>();
+
+    if (valorAporte <= 0) {
+      for (const c of catInfos) alocacaoCategoria.set(c.cat.id!, 0);
+    } else if (somaDeficits >= valorAporte) {
+      // Aporte insuficiente para cobrir déficits: rateia pelos déficits
+      for (const c of catInfos) {
+        const valor = somaDeficits > 0 ? valorAporte * (c.deficit / somaDeficits) : 0;
+        alocacaoCategoria.set(c.cat.id!, valor);
+      }
+    } else {
+      // Cobre déficits e distribui o excedente proporcional ao target
+      const excesso = valorAporte - somaDeficits;
+      for (const c of catInfos) {
+        const extra =
+          somaTargetsCat > 0 ? excesso * ((c.cat.targetPercentage || 0) / somaTargetsCat) : 0;
+        alocacaoCategoria.set(c.cat.id!, c.deficit + extra);
+      }
+    }
 
     this.aporteRecomendacoes = this.carteira.map((cat) => {
-      const valorCategoria = valorAporte * (cat.targetPercentage / 100);
+      const valorCategoria = alocacaoCategoria.get(cat.id!) ?? 0;
+      const totalNovoCategoria = cat.totalCategoria + valorCategoria;
 
-      const ativos = cat.ativos.map((ativo) => {
-        const valorRecomendado = valorCategoria * (ativo.targetPercentage / 100);
+      type AtivoInfo = {
+        ativo: InvestimentoComCalculo;
+        deficit: number;
+      };
+
+      const ativoInfos: AtivoInfo[] = cat.ativos.map((ativo) => {
+        const alvoAtivo = totalNovoCategoria * ((ativo.targetPercentage || 0) / 100);
+        const deficitAtivo = Math.max(0, alvoAtivo - ativo.currentValue);
+        return { ativo, deficit: deficitAtivo };
+      });
+
+      const somaDeficitsAtivos = ativoInfos.reduce((s, a) => s + a.deficit, 0);
+      const somaTargetsAtivos = cat.ativos.reduce((s, a) => s + (a.targetPercentage || 0), 0);
+
+      const ativos = ativoInfos.map(({ ativo, deficit }) => {
+        let valorRecomendado = 0;
+        if (valorCategoria <= 0) {
+          valorRecomendado = 0;
+        } else if (somaDeficitsAtivos >= valorCategoria) {
+          valorRecomendado =
+            somaDeficitsAtivos > 0 ? valorCategoria * (deficit / somaDeficitsAtivos) : 0;
+        } else {
+          const excessoAtivo = valorCategoria - somaDeficitsAtivos;
+          const extra =
+            somaTargetsAtivos > 0
+              ? excessoAtivo * ((ativo.targetPercentage || 0) / somaTargetsAtivos)
+              : 0;
+          valorRecomendado = deficit + extra;
+        }
+
         return {
           ativoId: ativo.id!,
           ativoNome: ativo.name,
           valorRecomendado,
           currentPrice: ativo.currentPrice,
-          quantidadeRecomendada: ativo.currentPrice && ativo.currentPrice > 0
-            ? valorRecomendado / ativo.currentPrice
-            : undefined,
+          quantidadeRecomendada:
+            ativo.currentPrice && ativo.currentPrice > 0
+              ? valorRecomendado / ativo.currentPrice
+              : undefined,
         };
       });
 
@@ -233,6 +364,83 @@ export class InvestimentoComponent implements OnInit {
         ativos,
       };
     });
+  }
+
+  atualizarPrecosManual(): void {
+    const ativosComTicker = this.investimentos.filter((i) => !!i.quantity && i.quantity > 0 && !!i.name);
+    if (ativosComTicker.length === 0) {
+      this.notificationService.showMessage(
+        'Cadastre quantidade e um ticker válido nos ativos para buscar cotações automaticamente.',
+        'error',
+      );
+      return;
+    }
+
+    this.isLoading = true;
+    this.priceService.getPrices(ativosComTicker.map((i) => i.name)).subscribe({
+      next: (precos) => {
+        const atualizados: Investimento[] = [];
+        const falharam: string[] = [];
+        for (const inv of this.investimentos) {
+          const cot = precos[inv.name?.toUpperCase?.() ?? ''];
+          if (cot && inv.quantity && inv.quantity > 0) {
+            inv.currentPrice = cot.price;
+            inv.currentValue = inv.quantity * cot.price;
+            atualizados.push(inv);
+          } else if (inv.quantity && inv.quantity > 0) {
+            falharam.push(inv.name);
+          }
+        }
+
+        this.calcularCarteira();
+
+        if (atualizados.length === 0) {
+          this.isLoading = false;
+          const msg = !this.hasBrapiToken
+            ? 'Nenhum preço foi atualizado. Configure seu token da brapi para tickers brasileiros.'
+            : 'Nenhum preço foi atualizado. Verifique se os nomes dos ativos são tickers válidos.';
+          this.notificationService.showMessage(msg, 'error');
+          return;
+        }
+
+        // Persiste no backend em paralelo
+        const reqs = atualizados.map((inv) =>
+          this.investimentoService.updateInvestimento(inv).pipe(catchError(() => of(null))),
+        );
+        forkJoin(reqs).subscribe({
+          next: () => {
+            this.isLoading = false;
+            const sufixo = falharam.length > 0 ? ` (falhou: ${falharam.join(', ')})` : '';
+            this.notificationService.showMessage(
+              `${atualizados.length} preço(s) atualizado(s) com sucesso${sufixo}`,
+              'success',
+            );
+          },
+          error: () => {
+            this.isLoading = false;
+            this.notificationService.showMessage(
+              'Preços atualizados em tela, mas houve erro ao salvar.',
+              'error',
+            );
+          },
+        });
+      },
+      error: () => {
+        this.isLoading = false;
+        this.notificationService.showMessage('Erro ao buscar cotações.', 'error');
+      },
+    });
+  }
+
+  salvarToken(): void {
+    const token = (this.tokenForm.value.token ?? '').toString().trim();
+    this.priceService.setBrapiToken(token || null);
+    this.hasBrapiToken = !!token;
+    this.showTokenModal = false;
+    this.notificationService.showMessage(
+      token ? 'Token da brapi salvo com sucesso' : 'Token da brapi removido',
+      'success',
+    );
   }
 
   onAddCategoria(): void {
