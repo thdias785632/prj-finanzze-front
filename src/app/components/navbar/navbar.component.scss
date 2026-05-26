@@ -1,48 +1,37 @@
-// ========================================
-// VARIÁVEIS (mantendo padrão da landing)
-// ========================================
-$primary: #6639A6;
-$primary-dark: #4A1F7A;
-$primary-light: #F2EAFD;
-$secondary: #A583D4;
-$accent: #9D4EDD;
-$accent-bright: #C77DFF;
-$white: #FFFFFF;
-$text-dark: #1F2937;
+@use '../../styles/variables' as *;
 
-$navbar-height: 42px;
-$mobile: 768px;
+$navbar-h: 56px;
 
-// ========================================
-// NAVBAR SUPERIOR - REFATORADA
-// ========================================
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
   color: $white;
-  padding: 12px 0px;
+  padding: 0;
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  height: $navbar-height;
+  height: $navbar-h;
   z-index: 1000;
   box-shadow: 
     0 4px 16px rgba(0, 0, 0, 0.3),
     0 0 24px rgba($accent, 0.2);
   backdrop-filter: blur(8px);
 
-  // Brand/Logo (esquerda)
   .brand {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin: 0px 16px;
+    gap: $spacing-sm;
+    margin: 0 $spacing-md;
+
+    @include tablet {
+      margin: 0 $spacing-xl;
+    }
 
     .brand-text {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 900;
       font-family: 'Asap', sans-serif;
       letter-spacing: 2px;
@@ -52,28 +41,30 @@ $mobile: 768px;
       background-clip: text;
       text-shadow: 0 2px 8px rgba($accent-bright, 0.3);
       
-      @media (max-width: $mobile) {
-        font-size: 18px;
-        letter-spacing: 1px;
+      @include tablet {
+        font-size: 20px;
+      }
+
+      @include desktop {
+        font-size: 22px;
+        letter-spacing: 3px;
       }
     }
   }
 
-  // Header dinâmico (centro)
   .header {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
     text-align: center;
     font-family: 'Asap', sans-serif;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     flex-grow: 1;
     
-    @media (max-width: $mobile) {
-      font-size: 16px;
+    @include tablet {
+      font-size: 18px;
     }
   }
 
-  // User icon + dropdown (direita)
   .user-icon {
     position: relative;
     cursor: pointer;
@@ -85,7 +76,11 @@ $mobile: 768px;
     border-radius: 50%;
     background: rgba($white, 0.15);
     transition: all 0.3s ease;
-    margin: 0px 16px;
+    margin: 0 $spacing-md;
+
+    @include tablet {
+      margin: 0 $spacing-xl;
+    }
 
     &:hover {
       background: rgba($white, 0.25);
@@ -103,7 +98,6 @@ $mobile: 768px;
       height: 24px;
     }
 
-    // Dropdown menu
     .dropdown-menu {
       display: none;
       position: absolute;
@@ -113,13 +107,11 @@ $mobile: 768px;
       background: rgba($white, 0.98);
       backdrop-filter: blur(16px);
       border: 1px solid rgba($primary, 0.1);
-      border-radius: 12px;
-      box-shadow: 
-        0 8px 24px rgba(0, 0, 0, 0.2),
-        0 0 16px rgba($accent, 0.15);
-      padding: 8px;
+      border-radius: $radius-lg;
+      box-shadow: $shadow-lg;
+      padding: $spacing-sm;
       z-index: 1001;
-      animation: dropdownSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: dropdownSlideIn 0.3s $ease-smooth;
 
       &.open {
         display: block;
@@ -128,12 +120,12 @@ $mobile: 768px;
       .dropdown-item {
         display: flex;
         align-items: center;
-        gap: 12px;
-        padding: 12px 16px;
+        gap: $spacing-sm;
+        padding: $spacing-sm $spacing-md;
         color: $text-dark;
         text-decoration: none;
         cursor: pointer;
-        border-radius: 8px;
+        border-radius: $radius-md;
         font-family: 'Asap', sans-serif;
         font-weight: 600;
         font-size: 14px;

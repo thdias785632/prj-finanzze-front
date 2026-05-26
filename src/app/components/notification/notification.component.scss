@@ -1,13 +1,26 @@
+@use '../../styles/variables' as *;
+
 .notification {
   position: fixed;
-  top: 20px;
-  right: 20px;
-  padding: 10px 20px;
-  border-radius: 5px;
-  color: #fff;
+  top: 72px;
+  right: $spacing-md;
+  left: $spacing-md;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-md;
+  color: $white;
   cursor: pointer;
-  z-index: 1000;
+  z-index: 1100;
   transition: opacity 0.3s ease-in-out;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: $shadow-lg;
+
+  @include tablet {
+    left: auto;
+    right: $spacing-xl;
+    min-width: 280px;
+    max-width: 420px;
+  }
 
   &.success {
     background-color: #4caf50;

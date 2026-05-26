@@ -1,163 +1,226 @@
-$primary: #6639A6;
-$primary-light: #F2EAFD;
-$secondary: #A583D4;
-$red-500: #B20000;
-$green-500: #007505;
-$blue-500: #0065C1;
+@use '../../styles/variables' as *;
 
 .container {
   background-color: $primary-light;
-  height: 100vh;
-  margin: 64px 0 0;
-  padding: 16px 16px 52px 16px;
+  min-height: 100vh;
+  margin: 0;
+  padding: $spacing-md $spacing-md $spacing-2xl;
+
+  @include tablet {
+    padding: $spacing-lg $spacing-xl $spacing-2xl;
+  }
+
+  @include desktop {
+    padding: $spacing-xl $spacing-2xl $spacing-2xl;
+  }
   
   section {
     display: flex;
     flex-direction: column;
-    justify-content: start;
-    align-items: start;
+    align-items: stretch;
+    @include content-container;
+    @include content-container-wide;
   }
   
   button {
     height: 35px;
-    margin-top: 8px;
+    margin-top: $spacing-sm;
     background-color: $primary;
-    color: #ffffff;
+    color: $white;
     border: none;
-    border-radius: 6px;
+    border-radius: $radius-sm;
     font-size: 14px;
     font-weight: 500;
     text-align: center;
     cursor: pointer;
+    padding: 0 $spacing-md;
+    transition: background-color 0.2s $ease-smooth, transform 0.1s;
+
+    &:hover {
+      background-color: $primary-dark;
+    }
+
+    &:active {
+      transform: scale(0.97);
+    }
   }
 }
 
 h1 {
-    color: $primary;
-    font-size: 30px;
-    margin: 0px;
-    font-family: 'Asap';
-    font-weight: 400;
+  color: $primary;
+  font-size: 24px;
+  margin: 0;
+  font-family: 'Asap', sans-serif;
+  font-weight: 400;
+
+  @include tablet {
+    font-size: 28px;
+  }
 }
-  
+
 h2 {
-    color: $primary;
-    font-size: 16px;
-    margin: 0px;
-    font-weight: 300;
-    font-family: 'Asap';
+  color: $primary;
+  font-size: 16px;
+  margin: 0;
+  font-weight: 300;
+  font-family: 'Asap', sans-serif;
 }
 
 h3 {
-    color: $primary;
-    font-size: 12px;
-    margin: 0px;
-    font-weight: 300;
-    font-family: 'Asap';
+  color: $primary;
+  font-size: 12px;
+  margin: 0;
+  font-weight: 300;
+  font-family: 'Asap', sans-serif;
 }
 
-.new-itens{
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 16px;
+.new-itens {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: $spacing-md;
+  gap: $spacing-sm;
 
-    button {
-        margin-left: 12px;
-    }
+  button {
+    margin-left: 0;
+  }
 }
 
 .extract {
   width: 100%;
+
+  @include tablet {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-lg;
+  }
+
+  @include desktop {
+    gap: $spacing-xl;
+  }
 }
 
 .extract-item {
-  margin-bottom: 24px;
+  margin-bottom: $spacing-lg;
   display: flex;
   flex-direction: column;
   justify-content: start;
-  padding: 12px;
-  border-radius: 6px;
-  background-color: #ffffff;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  padding: $spacing-md;
+  border-radius: $radius-md;
+  background-color: $white;
+  box-shadow: $shadow-md;
+  transition: box-shadow 0.2s $ease-smooth;
+
+  @include tablet {
+    padding: $spacing-lg;
+    margin-bottom: 0;
+  }
+
+  @include desktop {
+    &:hover {
+      box-shadow: $shadow-lg;
+    }
+  }
 
   mat-icon {
-    color: rgba(#718EBF, 0.3);
+    color: rgba($text-muted, 0.3);
     font-size: 24px;
+    cursor: pointer;
+    transition: color 0.2s;
+
+    &:hover {
+      color: rgba($text-muted, 0.7);
+    }
   }
 
   .header {
     display: flex;
     justify-content: space-between;
+    align-items: flex-start;
 
     h2 {
-        color: #718EBF;
+      color: $text-muted;
     }
 
     p {
-        color: $blue-500;
-        margin-top: 8px;
+      color: $blue-500;
+      margin-top: $spacing-sm;
+      font-weight: 600;
+      font-size: 18px;
+
+      @include tablet {
+        font-size: 20px;
+      }
     }
   }
 }
 
+// Modal
 .modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  overflow: hidden;
+  padding: $spacing-md;
 }
 
 .modal-content {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    width: 400px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  background-color: $white;
+  padding: $spacing-lg;
+  border-radius: $radius-lg;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: $shadow-lg;
 
-    h2 {
-      font-weight: bold;
-      font-size: 19px;
+  @include tablet {
+    padding: $spacing-xl;
+  }
+
+  h2 {
+    font-weight: bold;
+    font-size: 19px;
+  }
+
+  form {
+    margin-top: $spacing-xl;
+
+    mat-form-field {
+      width: 100%;
     }
-
-    form {
-      margin-top: 32px;
-
-      mat-form-field {
-        width: 100%;
-      }
-    }
+  }
 }
 
 .card-buttons {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  
-    button {
-      width: 49%;
-      height: 40px;
-      border-radius: 6px;
-      background-color: $primary;
-      color: #ffffff;
-      border: none;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 16px;
-      margin-bottom: 16px;
-    }
-  
-    .cancel {
-      background-color: $primary-light;
-      color: $primary;
-    }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $spacing-sm;
+
+  button {
+    flex: 1;
+    height: 40px;
+    border-radius: $radius-sm;
+    background-color: $primary;
+    color: $white;
+    border: none;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: $spacing-md;
+    margin-bottom: $spacing-md;
+  }
+
+  .cancel {
+    background-color: $primary-light;
+    color: $primary;
+  }
 }
 
 .footer {
@@ -165,13 +228,23 @@ h3 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px;
-  background-color: #ffffff;
+  padding: $spacing-md;
+  background-color: $white;
   color: $primary;
-  bottom: 0;
-  width: calc(100% - 32px);
+  bottom: $bottom-nav-height;
+  left: 0;
+  width: 100%;
   height: 20px;
-  box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+  box-sizing: border-box;
+
+  @include tablet {
+    max-width: $content-max-width;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: $radius-md $radius-md 0 0;
+  }
 }
 
 .footer button {
@@ -179,40 +252,62 @@ h3 {
 }
 
 .extract-table {
-    max-width: 100%;
-    overflow-x: scroll;
-    
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 16px;
+  max-width: 100%;
+  overflow-x: auto;
+  margin-top: $spacing-md;
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
 
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
+    th, td {
+      padding: $spacing-sm $spacing-md;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+      font-size: 13px;
+      white-space: nowrap;
 
-        th {
-            background-color: $primary-light;
-            color: $primary;
-        }
-
-        tr:hover {
-            background-color: #f1f1f1;
-        }
+      @include tablet {
+        font-size: 14px;
+        padding: $spacing-md;
+        white-space: normal;
+      }
     }
+
+    th {
+      background-color: $primary-light;
+      color: $primary;
+      font-weight: 600;
+    }
+
+    tr {
+      transition: background-color 0.15s;
+    }
+
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+  }
 }
 
 .no-card-found {
-  background-color: #ffffff;
-  border-radius: 6px;
-  padding: 8px 0px 8px 0px;
+  background-color: $white;
+  border-radius: $radius-md;
+  padding: $spacing-xl $spacing-md;
   text-align: center;
   width: 100%;
+  box-shadow: $shadow-sm;
 
-  mat-icon{
+  @include tablet {
+    grid-column: 1 / -1;
+    padding: $spacing-2xl;
+  }
+
+  mat-icon {
     font-size: 48px;
+    width: 48px;
+    height: 48px;
     color: $primary;
+    margin-bottom: $spacing-sm;
   }
 }
