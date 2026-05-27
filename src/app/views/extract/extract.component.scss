@@ -1,46 +1,60 @@
-$primary: #6639A6;
-$primary-light: #F2EAFD;
-$secondary: #A583D4;
-$red-500: #B20000;
-$green-500: #007505;
-$blue-500: #0065C1;
+@use '../../styles/variables' as *;
 
 .container {
   background-color: $primary-light;
-  height: 100%;
-  margin: 64px 0 0;
-  padding: 16px 16px 52px 16px;
+  min-height: 100vh;
+  margin: 0;
+  padding: $spacing-md $spacing-md $spacing-2xl;
+  padding-bottom: 150px !important;
+
+  @include tablet {
+    padding: $spacing-lg $spacing-xl $spacing-2xl;
+  }
+
+  @include desktop {
+    padding: $spacing-xl $spacing-2xl $spacing-2xl;
+  }
   
   section {
     display: flex;
     flex-direction: column;
-    justify-content: start;
-    align-items: start;
+    align-items: stretch;
+    @include content-container;
+    @include content-container-wide;
   }
   
   button {
     height: 35px;
     background-color: $primary;
-    color: #ffffff;
+    color: $white;
     border: none;
-    border-radius: 6px;
+    border-radius: $radius-sm;
     font-size: 16px;
     font-weight: 500;
     text-align: center;
     cursor: pointer;
+    transition: background-color 0.2s $ease-smooth, transform 0.1s;
+
+    &:hover {
+      background-color: $primary-dark;
+    }
+
+    &:active {
+      transform: scale(0.97);
+    }
   }
 }
 
 .new-card {
-  padding: 16px;
+  padding: $spacing-md;
   text-align: center;
 
   button {
     height: 35px;
     background-color: $primary;
-    color: #ffffff;
+    color: $white;
     border: none;
-    border-radius: 6px;
+    border-radius: $radius-sm;
     font-size: 16px;
     font-weight: 500;
     text-align: center;
@@ -49,46 +63,83 @@ $blue-500: #0065C1;
 }
 
 h1 {
-    color: $primary;
-    font-size: 30px;
-    margin: 0px;
-    font-family: 'Asap';
-    font-weight: 400;
+  color: $primary;
+  font-size: 24px;
+  margin: 0;
+  font-family: 'Asap', sans-serif;
+  font-weight: 400;
+
+  @include tablet {
+    font-size: 28px;
+  }
 }
-  
+
 h2 {
-    color: $primary;
-    font-size: 16px;
-    margin: 0px;
-    font-weight: 300;
-    font-family: 'Asap';
+  color: $primary;
+  font-size: 16px;
+  margin: 0;
+  font-weight: 300;
+  font-family: 'Asap', sans-serif;
 }
 
 h3 {
-    color: $primary;
-    font-size: 12px;
-    margin: 0px;
-    font-weight: 300;
-    font-family: 'Asap';
+  color: $primary;
+  font-size: 12px;
+  margin: 0;
+  font-weight: 300;
+  font-family: 'Asap', sans-serif;
 }
 
 .extract {
-  width: 100%;;
+  width: 100%;
+}
+
+// Grid layout for tablet+
+@include tablet {
+  .extract > div {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-lg;
+    align-items: start;
+  }
+
+  .extract-item.balance-item,
+  .extract-item.chart-extract {
+    grid-column: 1 / -1;
+  }
+}
+
+@include desktop {
+  .extract > div {
+    gap: $spacing-xl;
+  }
 }
 
 .extract-item {
-  margin-bottom: 24px;
+  margin-bottom: $spacing-lg;
   display: flex;
   flex-direction: column;
   justify-content: start;
-  padding: 12px;
-  border-radius: 6px;
-  background-color: #ffffff;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  padding: $spacing-md;
+  border-radius: $radius-md;
+  background-color: $white;
+  box-shadow: $shadow-md;
+  transition: box-shadow 0.2s $ease-smooth;
+
+  @include tablet {
+    padding: $spacing-lg;
+    margin-bottom: 0;
+  }
+
+  @include desktop {
+    &:hover {
+      box-shadow: $shadow-lg;
+    }
+  }
 }
 
 .balance-item {
-  margin-bottom: 16px;
+  margin-bottom: $spacing-md;
 }
 
 .header {
@@ -96,10 +147,16 @@ h3 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: $spacing-lg;
 
   button {
-    width: 40%;
+    width: auto;
+    padding: 0 $spacing-md;
+
+    @include tablet {
+      width: auto;
+      min-width: 120px;
+    }
   }
 }
 
@@ -109,7 +166,7 @@ h3 {
   }
   
   h2 {
-    color: #718EBF
+    color: $text-muted;
   }
 }
 
@@ -120,30 +177,46 @@ h3 {
 .revenue-item, .expenses-item {
   display: flex;
   justify-content: start;
-  align-items: end;
+  align-items: center;
   width: 100%;
-  height: 100%;
+  gap: $spacing-sm;
 
   p {
-    margin-bottom: 0px;
-    width: 40%;
+    margin-bottom: 0;
+    width: 35%;
+    min-width: 100px;
+    font-size: 14px;
+
+    @include tablet {
+      width: 30%;
+      font-size: 15px;
+    }
   }
 
   h2 {
-    margin-bottom: 0px;
-    width: 60%;
-  }
+    margin-bottom: 0;
+    flex: 1;
+    font-size: 14px;
 
+    @include tablet {
+      font-size: 15px;
+    }
+  }
 }
 
 .expenses-item p {
-  min-width: 40%;
+  min-width: 100px;
 }
 
 mat-icon {
-  color: rgba(#718EBF, 0.3);
+  color: rgba($text-muted, 0.3);
   font-size: 24px;
   cursor: pointer;
+  transition: color 0.2s;
+
+  &:hover {
+    color: rgba($text-muted, 0.7);
+  }
 }
 
 .expenses {
@@ -155,11 +228,11 @@ mat-icon {
 
   span {
     font-size: 14px;
-    color: #718EBF;
+    color: $text-muted;
   }
 
   h2 {
-    margin-top: 8px
+    margin-top: $spacing-sm;
   }
 }
 
@@ -168,64 +241,71 @@ mat-icon {
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  height: 100%;
 
   h2 {
-    color: #718EBF
+    color: $text-muted;
   }
 }
 
+// Modals
 .modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden; // Prevent scrolling outside the modal
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  overflow: hidden;
 }
 
 .modal-content {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    width: 400px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  background-color: $white;
+  padding: $spacing-lg;
+  border-radius: $radius-lg;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: $shadow-lg;
 
-    h2 {
-      font-weight: bold;
-      font-size: 19px;
+  @include tablet {
+    padding: $spacing-xl;
+  }
+
+  h2 {
+    font-weight: bold;
+    font-size: 19px;
+  }
+
+  form {
+    margin-top: $spacing-xl;
+
+    mat-form-field {
+      width: 100%;
     }
-
-    form {
-      margin-top: 32px;
-
-      mat-form-field {
-        width: 100%;
-      }
-    }
+  }
 }
 
 .revenue-buttons {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: $spacing-sm;
 
   button {
-    width: 49%;
+    flex: 1;
     height: 40px;
-    border-radius: 6px;
+    border-radius: $radius-sm;
     background-color: $primary;
-    color: #ffffff;
+    color: $white;
     border: none;
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
-    margin-top: 16px;
-    margin-bottom: 16px;
+    margin-top: $spacing-md;
+    margin-bottom: $spacing-md;
   }
 
   .cancel {
@@ -239,13 +319,23 @@ mat-icon {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px;
-  background-color: #ffffff;
+  padding: $spacing-md;
+  background-color: $white;
   color: $primary;
-  bottom: 48px;
-  width: calc(100% - 32px);
-  height: 20px;
-  box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.3);
+  bottom: $bottom-nav-height;
+  left: 0;
+  width: 100%;
+  height: 55px;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+  box-sizing: border-box;
+
+  @include tablet {
+    max-width: $content-max-width;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: $radius-md $radius-md 0 0;
+  }
 }
 
 .footer button {
@@ -253,43 +343,46 @@ mat-icon {
 }
 
 .modal-expensses, .modal-category {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
 }
 
 .content-expensses, .content-category {
-    background-color: #fff;
-    border-radius: 8px;
-    width: 90%;
-    max-height: 80%;
-    overflow-y: auto;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    padding: 0px;
+  background-color: $white;
+  border-radius: $radius-lg;
+  width: 90%;
+  max-width: 520px;
+  max-height: 80%;
+  overflow-y: auto;
+  box-shadow: $shadow-lg;
+  padding: 0;
 
-    form {
-      padding: 8px 16px 16px 16px;
-    }
+  form {
+    padding: $spacing-sm $spacing-md $spacing-md;
+  }
 }
 
 .content-category h2 {
-    padding: 16px;
+  padding: $spacing-md;
 }
 
 .modal-expensses-header {
   display: flex;
   justify-content: space-between;
   align-items: end;
-  margin-bottom: 16px;
+  margin-bottom: $spacing-md;
   height: 45px;
   text-align: center;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: $shadow-sm;
   
   h2 {
     width: 50%;
     border-bottom: 4px solid transparent;
-    padding: 8px;
+    padding: $spacing-sm;
+    cursor: pointer;
+    transition: border-color 0.2s;
   }
 }
 
@@ -298,10 +391,10 @@ mat-icon {
 }
 
 .chart-extract__item {
-  padding-top: 16px;
+  padding-top: $spacing-md;
 }
 
-.modal-card-extract{
+.modal-card-extract {
   height: 63%;
   overflow-y: scroll;
   overflow-x: hidden;
@@ -309,80 +402,94 @@ mat-icon {
 
 .extract-table {
   overflow-y: hidden;
-    overflow-x: scroll;
+  overflow-x: auto;
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 16px;
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: $spacing-md;
 
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
+    th, td {
+      padding: $spacing-sm $spacing-md;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+      white-space: nowrap;
 
-        th {
-            background-color: $primary-light;
-            color: $primary;
-        }
-
-        tr:hover {
-            background-color: #f1f1f1;
-        }
+      @include tablet {
+        white-space: normal;
+      }
     }
+
+    th {
+      background-color: $primary-light;
+      color: $primary;
+      font-size: 13px;
+      font-weight: 600;
+
+      @include tablet {
+        font-size: 14px;
+      }
+    }
+
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+  }
 }
 
 .extract-table-actions {
-    display: flex;
+  display: flex;
+  gap: $spacing-xs;
 }
 
 .modal-card-extract-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: $spacing-md;
 }
 
 .card-buttons {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  
-    button {
-      width: 49%;
-      height: 40px;
-      border-radius: 6px;
-      background-color: $primary;
-      color: #ffffff;
-      border: none;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 16px;
-      margin-bottom: 16px;
-    }
-  
-    .cancel {
-      background-color: $primary-light;
-      color: $primary;
-    }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $spacing-sm;
+
+  button {
+    flex: 1;
+    height: 40px;
+    border-radius: $radius-sm;
+    background-color: $primary;
+    color: $white;
+    border: none;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: $spacing-md;
+    margin-bottom: $spacing-md;
+  }
+
+  .cancel {
+    background-color: $primary-light;
+    color: $primary;
+  }
 }
 
 .send-extract {
   display: flex;
   justify-content: end;
-  margin-bottom: 24px;
+  margin-bottom: $spacing-lg;
   
   button {
     font-size: 12px;
     display: flex;
     align-items: center;
+    padding: 0 $spacing-md;
   }
 
-  mat-icon{
+  mat-icon {
     color: $primary-light;
-    margin-left: 4px;
+    margin-left: $spacing-xs;
   }
 }
 
@@ -392,9 +499,9 @@ mat-icon {
 
 tfoot {
   span {
-    padding: 4px 0px;
+    padding: 4px 0;
     width: 100%;
     font-size: 12px;
-    color: #718EBF;
+    color: $text-muted;
   }
 }

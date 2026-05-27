@@ -1,8 +1,6 @@
-$navbar-height: 62px;
-$bottom-nav-height: 66px;
+@use './app/styles/variables' as *;
 
 // Custom Theming for Angular Material
-// For more information: https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
 
 html {
@@ -15,7 +13,7 @@ html {
     typography: Roboto,
     density: 0,
   ));
-}/* You can add global styles to this file, and also import other style files */
+}
 
 html, body { 
   hr {
@@ -25,14 +23,15 @@ html, body {
     width: 100%;
   }
 }
+
 body {
-  background-color: #6639A6;
+  background-color: $primary;
   margin: 0; 
   font-family: Roboto, "Helvetica Neue", sans-serif;
   overflow-x: hidden;
 }
 
-//styles for scrollbar
+// Scrollbar
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -47,24 +46,23 @@ body {
   background-color: rgba(0, 0, 0, 0.05);
 }
 
-// Conteúdo principal
+// Main content area
 .main-content {
   flex: 1;
   margin-top: $navbar-height !important;
   padding-bottom: $bottom-nav-height !important;
   overflow-x: hidden;
-  
-  // Safe area para iOS (notch)
+
   @supports (padding-bottom: env(safe-area-inset-bottom)) {
     padding-bottom: calc($bottom-nav-height + env(safe-area-inset-bottom));
   }
-  
-  // Desktop: ajustar se bottom-nav estiver oculta
-  @media (min-width: 1024px) {
-    // Opção 1: Se esconder bottom-nav no desktop
-    // padding-bottom: 24px;
-    
-    // Opção 2: Se manter bottom-nav no desktop
+
+  @include tablet {
     padding-bottom: $bottom-nav-height;
+  }
+
+  @include desktop {
+    padding-left: $spacing-lg;
+    padding-right: $spacing-lg;
   }
 }

@@ -1,80 +1,71 @@
-// ========================================
-// VARIÁVEIS (padrão landing page)
-// ========================================
-$primary: #6639A6;
-$primary-dark: #4A1F7A;
-$primary-light: #F2EAFD;
-$secondary: #A583D4;
-$accent: #9D4EDD;
-$accent-bright: #C77DFF;
-$white: #FFFFFF;
-$text-light: #9CA3AF;
+@use '../../styles/variables' as *;
 
-$bottom-nav-height: 48px;
-$mobile: 768px;
-$desktop: 1024px;
+$bottom-nav-h: 56px;
 
-// ========================================
-// BOTTOM NAVIGATION - MOBILE FIRST
-// ========================================
+// BOTTOM NAVIGATION
 .bottom-navigation {
   position: fixed;
   bottom: 0;
   left: 0;
   width: 100%;
-  height: $bottom-nav-height;
+  height: $bottom-nav-h;
   background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
   display: flex;
   justify-content: space-around;
   align-items: center;
-  padding: 0 8px 0;
+  padding: 0 $spacing-sm 0;
   z-index: 999;
   box-shadow: 
     0 -4px 16px rgba(0, 0, 0, 0.3),
     0 0 32px rgba($accent, 0.2);
   backdrop-filter: blur(16px);
+  animation: slideInBottom 0.4s $ease-smooth;
 
-  // Desktop: pode ocultar ou manter (ajuste conforme necessidade)
-  @media (min-width: $desktop) {
-    // Opção 1: Ocultar no desktop
-    // display: none;
-    
-    // Opção 2: Manter mas com estilo diferente
+  @include tablet {
     justify-content: center;
-    gap: 24px;
-    padding: 0 24px 8px;
+    gap: $spacing-md;
+    padding: 0 $spacing-lg;
   }
 
-  // ========================================
-  // ITEM DE NAVEGAÇÃO
-  // ========================================
+  @include desktop {
+    justify-content: center;
+    gap: $spacing-xl;
+    padding: 0 $spacing-xl;
+  }
+
+  // NAV ITEM
   .nav-item {
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: end;
+    justify-content: center;
     gap: 4px;
     flex: 1;
-    max-width: 120px;
-    max-height: 42px;
+    max-width: 100px;
+    min-width: 48px;
+    min-height: 48px;
     text-decoration: none;
     color: rgba($white, 0.6);
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border-radius: 8px;
+    transition: all 0.3s $ease-smooth;
+    border-radius: $radius-md;
     overflow: hidden;
+    padding: $spacing-xs;
 
-    // Desktop: área de toque menor
-    @media (min-width: $desktop) {
+    @include tablet {
       flex: 0 0 auto;
-      max-width: 100px;
-      padding: 8px 16px;
+      max-width: 110px;
+      padding: $spacing-sm $spacing-md;
     }
 
-    // ========================================
-    // WRAPPER DO ÍCONE
-    // ========================================
+    @include desktop {
+      flex: 0 0 auto;
+      max-width: 120px;
+      padding: $spacing-sm $spacing-lg;
+    }
+
+    // ICON WRAPPER
     .icon-wrapper {
       position: relative;
       display: flex;
@@ -82,7 +73,7 @@ $desktop: 1024px;
       justify-content: center;
       width: 28px;
       height: 28px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.3s $ease-smooth;
 
       mat-icon {
         font-size: 24px;
@@ -92,11 +83,9 @@ $desktop: 1024px;
       }
     }
 
-    // ========================================
     // LABEL
-    // ========================================
     .label {
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 600;
       font-family: 'Asap', sans-serif;
       letter-spacing: 0.3px;
@@ -104,19 +93,20 @@ $desktop: 1024px;
       transition: all 0.3s ease;
       white-space: nowrap;
       
-      @media (max-width: 360px) {
-        // Oculta label em telas muito pequenas
+      @media (max-width: $mobile-sm) {
         display: none;
       }
 
-      @media (min-width: $desktop) {
+      @include tablet {
+        font-size: 11px;
+      }
+
+      @include desktop {
         font-size: 12px;
       }
     }
 
-    // ========================================
-    // RIPPLE EFFECT (fundo ao tocar)
-    // ========================================
+    // RIPPLE
     .ripple {
       position: absolute;
       top: 0;
@@ -130,10 +120,8 @@ $desktop: 1024px;
       pointer-events: none;
     }
 
-    // ========================================
-    // ESTADOS: HOVER (Desktop)
-    // ========================================
-    @media (min-width: $desktop) {
+    // HOVER (Desktop)
+    @include desktop {
       &:hover:not(.active) {
         color: rgba($white, 0.9);
         background: rgba($white, 0.08);
@@ -144,9 +132,7 @@ $desktop: 1024px;
       }
     }
 
-    // ========================================
-    // ESTADOS: PRESSED (Mobile)
-    // ========================================
+    // PRESSED
     &:active {
       transform: scale(0.95);
 
@@ -156,17 +142,10 @@ $desktop: 1024px;
       }
     }
 
-    // ========================================
-    // ESTADO: ACTIVE (Rota ativa)
-    // ========================================
+    // ACTIVE STATE
     &.active {
       color: $white;
-      top: 4px;
       background: rgba($white, 0.12);
-
-      .active-indicator {
-        transform: translateX(-50%) scaleX(1);
-      }
 
       .icon-wrapper {
         transform: scale(1.15);
@@ -183,7 +162,6 @@ $desktop: 1024px;
         text-shadow: 0 0 8px rgba($accent-bright, 0.4);
       }
 
-      // Glow effect sutil
       &::before {
         content: '';
         position: absolute;
@@ -195,12 +173,16 @@ $desktop: 1024px;
         pointer-events: none;
       }
     }
+
+    // Focus state
+    &:focus-visible {
+      outline: 2px solid $accent-bright;
+      outline-offset: 2px;
+      background: rgba($white, 0.12);
+    }
   }
 }
 
-// ========================================
-// ANIMAÇÃO DE ENTRADA
-// ========================================
 @keyframes slideInBottom {
   from {
     transform: translateY(100%);
@@ -212,32 +194,10 @@ $desktop: 1024px;
   }
 }
 
-.bottom-navigation {
-  animation: slideInBottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-// ========================================
-// SAFE AREA (iOS notch, Android gesture bar)
-// ========================================
+// SAFE AREA
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
   .bottom-navigation {
-    padding-bottom: calc(8px + env(safe-area-inset-bottom));
-    height: calc($bottom-nav-height + env(safe-area-inset-bottom));
-  }
-}
-
-// ========================================
-// ACESSIBILIDADE
-// ========================================
-.nav-item {
-  // Área de toque mínima de 48px (WCAG)
-  min-width: 48px;
-  min-height: 48px;
-
-  // Focus state para teclado
-  &:focus-visible {
-    outline: 2px solid $accent-bright;
-    outline-offset: 2px;
-    background: rgba($white, 0.12);
+    padding-bottom: calc($spacing-sm + env(safe-area-inset-bottom));
+    height: calc($bottom-nav-h + env(safe-area-inset-bottom));
   }
 }
