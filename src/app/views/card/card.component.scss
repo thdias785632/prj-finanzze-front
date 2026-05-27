@@ -5,6 +5,7 @@
   min-height: 100vh;
   margin: 0;
   padding: $spacing-md $spacing-md $spacing-2xl;
+  padding-bottom: $spacing-4xl !important;
 
   @include tablet {
     padding: $spacing-lg $spacing-xl $spacing-2xl;
@@ -12,6 +13,7 @@
 
   @include desktop {
     padding: $spacing-xl $spacing-2xl $spacing-2xl;
+    padding-bottom: $spacing-4xl !important;
   }
   
   section {
@@ -168,14 +170,13 @@ h3 {
   align-items: center;
   z-index: 1000;
   overflow: hidden;
-  padding: $spacing-md;
 }
 
 .modal-content {
   background-color: $white;
   padding: $spacing-lg;
   border-radius: $radius-lg;
-  width: 100%;
+  width: 70%;
   max-width: 480px;
   box-shadow: $shadow-lg;
 

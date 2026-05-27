@@ -5,6 +5,7 @@
   min-height: 100vh;
   margin: 0;
   padding: $spacing-md $spacing-md $spacing-2xl;
+  padding-bottom: $spacing-4xl !important;
 
   @include tablet {
     padding: $spacing-lg $spacing-xl $spacing-2xl;
@@ -447,14 +448,13 @@ h2 {
   align-items: center;
   z-index: 1000;
   overflow: hidden;
-  padding: $spacing-md;
 }
 
 .modal-content {
   background-color: $white;
   padding: $spacing-lg;
   border-radius: $radius-lg;
-  width: 90%;
+  width: 80%;
   max-width: 480px;
   max-height: 88vh;
   overflow-y: auto;
