@@ -2,72 +2,82 @@
 
 <div class="container main-content">
     <section>
-        <div class="extract">
-            <div class="saldo-extract" [routerLink]="'/extract'">
-                <h1>
-                    Saldo
-                </h1>
-    
-                <div class="extract-item" *ngIf="userExtract">
-                    <div class="revenues">
-                        <div>
-                            <h2>Entradas</h2>
-                            <p>R$ {{ userExtract.totalRevenues | number: '1.2-2' }}</p>
-                        </div>
-
-                        <button [routerLink]="'/extract'">Editar</button>
-                    </div>
-    
-                    <div class="expenses">
-                        <h2>Saídas</h2>
-                        <p>R$ {{ userExtract.totalExpensess | number: '1.2-2' }}</p>
-                    </div>
-    
-                    <hr/>
-                    
-                    <div class="balance-container">
-                        <div class="balance">
-                            <h2>Saldo</h2>
-                            <p>R$ {{ userExtract.totalRevenues - userExtract.totalExpensess | number: '1.2-2' }}</p>
-                        </div>
-    
-                        <h2>{{ date | date: 'MMM/YYYY' }}</h2>
-                    </div>
-    
+        <div class="dashboard">
+            <!-- Saldo do mês em destaque -->
+            <a class="hero" *ngIf="userExtract" [routerLink]="'/extract'" aria-label="Ver extrato detalhado do mês">
+                <div class="hero-top">
+                    <span class="hero-greeting">Olá<ng-container *ngIf="firstName">, {{ firstName }}</ng-container></span>
+                    <span class="hero-month">{{ date | date: 'MMM yyyy' }}</span>
                 </div>
-            </div>
 
-            <div class="card-extract" *ngIf="cardsExtract && cardsExtract.length > 0" [routerLink]="'/card'">
-                <h1>
-                    Cartões
-                </h1>
-    
-                <div class="card-extract__item" *ngFor="let extract of cardsExtract">
-                    <div class="card-extract-header">
-                        <div>
-                            <h2>Fatura:</h2>
-                            <p>R$ {{ extract.total | number: '1.2-2' }}</p>
-                        </div>
+                <span class="hero-caption">Saldo do mês</span>
+                <p class="hero-balance amount" [class.negative]="balance < 0">R$ {{ balance | number: '1.2-2' }}</p>
 
-                        <div class="card-name">
-                            <span>{{ extract.card.name }}</span>
-                            <span>{{ extract.card.flag }}</span>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-icon in" aria-hidden="true"><mat-icon>arrow_upward</mat-icon></span>
+                        <div class="stat-text">
+                            <span class="stat-label">Entradas</span>
+                            <span class="stat-value amount">R$ {{ userExtract.totalRevenues | number: '1.2-2' }}</span>
                         </div>
                     </div>
-    
-                    <div class="expenses">
-                        <div *ngFor="let expenses of extract.cardExpensess| slice:0:3">
-                            <p>{{ expenses.name }}</p>
-                            <p>R$ {{ expenses.value | number: '1.2-2' }}</p>
+
+                    <div class="stat">
+                        <span class="stat-icon out" aria-hidden="true"><mat-icon>arrow_downward</mat-icon></span>
+                        <div class="stat-text">
+                            <span class="stat-label">Saídas</span>
+                            <span class="stat-value amount">R$ {{ userExtract.totalExpensess | number: '1.2-2' }}</span>
                         </div>
                     </div>
                 </div>
+            </a>
+
+            <!-- Cartões -->
+            <div class="cards-section" *ngIf="cardsExtract && cardsExtract.length > 0">
+                <div class="section-head">
+                    <h2>Cartões</h2>
+                    <a class="link-more" [routerLink]="'/card'">Ver todos <mat-icon aria-hidden="true">chevron_right</mat-icon></a>
+                </div>
+
+                <div class="cards-grid">
+                    <a class="credit-card" *ngFor="let extract of cardsExtract" [routerLink]="'/card'" [attr.aria-label]="'Cartão ' + extract.card.name + ', fatura de ' + (extract.total | number: '1.2-2') + ' reais'">
+                        <div class="credit-card__visual">
+                            <div class="cc-top">
+                                <span class="cc-chip" aria-hidden="true"></span>
+                                <span class="cc-flag" *ngIf="extract.card.flag">{{ extract.card.flag }}</span>
+                            </div>
+
+                            <div class="cc-body">
+                                <span class="cc-label">Fatura atual</span>
+                                <span class="cc-value">R$ {{ extract.total | number: '1.2-2' }}</span>
+                            </div>
+
+                            <span class="cc-name">{{ extract.card.name | titlecase }}</span>
+                        </div>
+
+                        <div class="credit-card__recent">
+                            <span class="recent-title">Últimas compras</span>
+
+                            <ul *ngIf="extract.cardExpensess && extract.cardExpensess.length > 0; else noPurchases">
+                                <li *ngFor="let expenses of extract.cardExpensess | slice:0:3">
+                                    <span class="recent-name">{{ expenses.name }}</span>
+                                    <span class="recent-value amount">R$ {{ expenses.value | number: '1.2-2' }}</span>
+                                </li>
+                            </ul>
+
+                            <ng-template #noPurchases>
+                                <p class="recent-empty">Sem compras neste mês.</p>
+                            </ng-template>
+                        </div>
+                    </a>
+                </div>
             </div>
 
+            <!-- Categorias -->
             <div class="chart-extract" *ngIf="categoriesGrouped && !categoriesGrouped['Sem categorias']">
-                <h1>
-                    Categorias
-                </h1>
+                <div class="section-head">
+                    <h2>Gastos por categoria</h2>
+                </div>
 
                 <div class="chart-extract__item">
                     <app-dashboard-chart [data]="categoriesGrouped"></app-dashboard-chart>

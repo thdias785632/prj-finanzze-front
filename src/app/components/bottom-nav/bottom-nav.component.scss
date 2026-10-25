@@ -1,203 +1,83 @@
 @use '../../styles/variables' as *;
 
-$bottom-nav-h: 56px;
-
-// BOTTOM NAVIGATION
 .bottom-navigation {
   position: fixed;
   bottom: 0;
   left: 0;
   width: 100%;
-  height: $bottom-nav-h;
-  background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+  box-sizing: border-box;
+  height: calc(#{$bottom-nav-height} + env(safe-area-inset-bottom, 0px));
+  padding: $spacing-sm $spacing-sm env(safe-area-inset-bottom, 0px);
   display: flex;
   justify-content: space-around;
-  align-items: center;
-  padding: 0 $spacing-sm 0;
+  align-items: stretch;
+  background-color: $white;
+  border-top: 1px solid $border-soft;
+  box-shadow: 0 -4px 20px rgba(31, 20, 56, 0.06);
   z-index: 999;
-  box-shadow: 
-    0 -4px 16px rgba(0, 0, 0, 0.3),
-    0 0 32px rgba($accent, 0.2);
-  backdrop-filter: blur(16px);
-  animation: slideInBottom 0.4s $ease-smooth;
 
   @include tablet {
     justify-content: center;
-    gap: $spacing-md;
-    padding: 0 $spacing-lg;
+    gap: $spacing-lg;
   }
 
-  @include desktop {
-    justify-content: center;
-    gap: $spacing-xl;
-    padding: 0 $spacing-xl;
-  }
-
-  // NAV ITEM
   .nav-item {
     position: relative;
+    flex: 1;
+    max-width: 112px;
+    min-width: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4px;
-    flex: 1;
-    max-width: 100px;
-    min-width: 48px;
-    min-height: 48px;
+    gap: 2px;
+    color: $text-muted;
     text-decoration: none;
-    color: rgba($white, 0.82);
-    cursor: pointer;
-    transition: all 0.3s $ease-smooth;
-    border-radius: $radius-md;
-    overflow: hidden;
-    padding: $spacing-xs;
+    border-radius: $radius-lg;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.2s $ease-smooth;
 
-    @include tablet {
-      flex: 0 0 auto;
-      max-width: 110px;
-      padding: $spacing-sm $spacing-md;
-    }
-
-    @include desktop {
-      flex: 0 0 auto;
-      max-width: 120px;
-      padding: $spacing-sm $spacing-lg;
-    }
-
-    // ICON WRAPPER
+    // "pílula" atrás do ícone
     .icon-wrapper {
-      position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 28px;
-      height: 28px;
-      transition: all 0.3s $ease-smooth;
+      width: 56px;
+      height: 30px;
+      border-radius: 15px;
+      transition: background-color 0.25s $ease-smooth, transform 0.15s;
 
       mat-icon {
         font-size: 24px;
         width: 24px;
         height: 24px;
-        transition: all 0.3s ease;
+        color: inherit;
       }
     }
 
-    // LABEL
     .label {
       font-size: 12px;
-      font-weight: 600;
-      font-family: 'Asap', sans-serif;
-      letter-spacing: 0.3px;
-      text-align: center;
-      transition: all 0.3s ease;
+      font-weight: 500;
+      line-height: 1;
       white-space: nowrap;
-      
-      @media (max-width: $mobile-sm) {
-        display: none;
-      }
-
-      @include tablet {
-        font-size: 11px;
-      }
-
-      @include desktop {
-        font-size: 12px;
-      }
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
     }
 
-    // RIPPLE
-    .ripple {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle, rgba($white, 0.15) 0%, transparent 70%);
-      opacity: 0;
-      transform: scale(0);
-      transition: all 0.4s ease;
-      pointer-events: none;
-    }
-
-    // HOVER (Desktop)
     @include desktop {
-      &:hover:not(.active) {
-        color: rgba($white, 0.9);
-        background: rgba($white, 0.08);
-
-        .icon-wrapper {
-          transform: translateY(-2px) scale(1.1);
-        }
-      }
+      &:hover:not(.active) .icon-wrapper { background-color: rgba($primary, 0.07); }
     }
 
-    // PRESSED
-    &:active {
-      transform: scale(0.95);
+    &:active .icon-wrapper { transform: scale(0.94); }
 
-      .ripple {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-
-    // ACTIVE STATE
     &.active {
-      color: $white;
-      background: rgba($white, 0.12);
+      color: $primary-dark;
 
-      .icon-wrapper {
-        transform: scale(1.15);
-
-        mat-icon {
-          color: $accent-bright;
-          filter: drop-shadow(0 0 8px rgba($accent-bright, 0.6));
-        }
-      }
-
-      .label {
-        font-weight: 700;
-        color: $accent-bright;
-        text-shadow: 0 0 8px rgba($accent-bright, 0.4);
-      }
-
-      &::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: radial-gradient(circle at center, rgba($accent-bright, 0.15) 0%, transparent 70%);
-        pointer-events: none;
-      }
+      .icon-wrapper { background-color: $primary-light; color: $primary; }
+      .label { font-weight: 700; }
     }
 
-    // Focus state
-    &:focus-visible {
-      outline: 2px solid $accent-bright;
-      outline-offset: 2px;
-      background: rgba($white, 0.12);
-    }
-  }
-}
-
-@keyframes slideInBottom {
-  from {
-    transform: translateY(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-// SAFE AREA
-@supports (padding-bottom: env(safe-area-inset-bottom)) {
-  .bottom-navigation {
-    padding-bottom: calc($spacing-sm + env(safe-area-inset-bottom));
-    height: calc($bottom-nav-h + env(safe-area-inset-bottom));
+    &:focus-visible { outline-offset: -2px; }
   }
 }
