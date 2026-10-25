@@ -327,6 +327,7 @@ export class ExtractComponent implements OnInit {
       active: new FormControl(expenssesItem.active),
       recurrent: new FormControl(expenssesItem.recurrent),
       category: new FormControl(expenssesItem.category, [Validators.required]),
+      installments: new FormControl(expenssesItem.installments || 0, [Validators.min(0)]),
     });
 
     this.editExpenssesMode = true;
@@ -342,7 +343,7 @@ export class ExtractComponent implements OnInit {
       cardId: new FormControl(cardExpenssesItem.cardId, [Validators.required]),
       name: new FormControl(cardExpenssesItem.name, [Validators.required]),
       value: new FormControl(cardExpenssesItem.value, [Validators.required]),
-      installments: new FormControl(cardExpenssesItem.installment || 0, [Validators.min(0)]),
+      installments: new FormControl(cardExpenssesItem.installments || 0, [Validators.min(0)]),
       referenceDate: new FormControl(formatDateToAmericanFormat(new Date(cardExpenssesItem.referenceDate)), [Validators.required]),
       active: new FormControl(cardExpenssesItem.active),
       recurrent: new FormControl(cardExpenssesItem.recurrent),

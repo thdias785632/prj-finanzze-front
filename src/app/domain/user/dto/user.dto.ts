@@ -33,7 +33,7 @@ export interface Itens {
     recurrent: boolean;
     active: boolean;
     cardId?: string;
-    installment?: number;
+    installments?: number;
 }
 
 export interface Revenue {
