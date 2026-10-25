@@ -1,3 +1,4 @@
+import { ModalDirective } from '../../directives/modal.directive';
 import { Component, Input, OnInit } from '@angular/core';
 import { UserGateway } from '../../domain/user/gateway/user.gateway';
 import { NotificationService } from '../../infra/notification/notification.service';
@@ -22,6 +23,7 @@ import { Router, RouterModule } from '@angular/router';
 @Component({
   selector: 'app-card',
   imports: [
+    ModalDirective,
     CommonModule,
     MatFormFieldModule,
     MatInputModule,

@@ -40,7 +40,7 @@ h2 {
   color: $primary;
   font-size: 16px;
   margin: 0;
-  font-weight: 300;
+  font-weight: 500;
   font-family: 'Asap', sans-serif;
 }
 
@@ -60,14 +60,14 @@ h2 {
   flex-wrap: wrap;
 
   button {
-    height: 35px;
-    padding: 0 $spacing-sm;
+    min-height: $touch-target;
+    padding: 0 $spacing-md;
     background-color: $primary;
     color: $white;
     border: none;
-    border-radius: $radius-sm;
-    font-size: 12px;
-    font-weight: 500;
+    border-radius: $radius-lg;
+    font-size: 14px;
+    font-weight: 600;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -83,8 +83,8 @@ h2 {
     }
 
     @include tablet {
-      font-size: 13px;
-      padding: 0 $spacing-md;
+      font-size: 14px;
+      padding: 0 $spacing-lg;
     }
   }
 
@@ -436,56 +436,6 @@ h2 {
 }
 
 // MODAIS
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  overflow: hidden;
-}
-
-.modal-content {
-  background-color: $white;
-  padding: $spacing-lg;
-  border-radius: $radius-lg;
-  width: 80%;
-  max-width: 480px;
-  max-height: 88vh;
-  overflow-y: auto;
-  box-shadow: $shadow-lg;
-
-  @include tablet {
-    padding: $spacing-xl;
-  }
-
-  h2 {
-    font-weight: bold;
-    font-size: 18px;
-    margin-bottom: $spacing-md;
-  }
-
-  form {
-    display: flex;
-    flex-direction: column;
-
-    mat-form-field {
-      width: 100%;
-    }
-  }
-
-  p {
-    font-size: 14px;
-    color: #444;
-    margin: $spacing-sm 0 $spacing-md;
-  }
-}
-
 .modal-aporte {
   max-width: 540px;
 }
@@ -509,51 +459,6 @@ h2 {
   mat-form-field {
     flex: 1;
     min-width: 140px;
-  }
-}
-
-.revenue-buttons {
-  display: flex;
-  justify-content: space-between;
-  gap: $spacing-sm;
-  margin-top: $spacing-sm;
-
-  button {
-    flex: 1;
-    height: 40px;
-    border-radius: $radius-sm;
-    background-color: $primary;
-    color: $white;
-    border: none;
-    font-size: 15px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.2s $ease-smooth, transform 0.1s;
-
-    &:hover {
-      background-color: $primary-dark;
-    }
-
-    &:active {
-      transform: scale(0.97);
-    }
-
-    &.cancel {
-      background-color: $primary-light;
-      color: $primary;
-
-      &:hover {
-        background-color: #e6d6f7;
-      }
-    }
-
-    &.danger {
-      background-color: $red-500;
-
-      &:hover {
-        background-color: #900000;
-      }
-    }
   }
 }
 

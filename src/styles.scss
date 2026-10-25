@@ -7,8 +7,8 @@ html {
   @include mat.theme((
     color: (
       theme-type: light,
-      primary: mat.$azure-palette,
-      tertiary: mat.$blue-palette,
+      primary: mat.$violet-palette,
+      tertiary: mat.$violet-palette,
     ),
     typography: Roboto,
     density: 0,
@@ -66,3 +66,241 @@ body {
     padding-right: $spacing-lg;
   }
 }
+
+// ========================================
+// IDENTIDADE VISUAL - sistema global de UI
+// ========================================
+
+// Material alinhado à paleta da marca (antes usava azul)
+html {
+  --mat-sys-primary: #{$primary};
+  --mat-sys-on-primary: #{$white};
+  --mat-sys-primary-container: #{$primary-light};
+  --mat-sys-on-primary-container: #{$primary-dark};
+  --mat-sys-error: #{$danger};
+  --mat-sys-on-surface-variant: #{$text-muted};
+
+  --mat-form-field-outlined-outline-color: #C9B8E3;
+  --mat-form-field-outlined-hover-outline-color: #{$secondary};
+  --mat-form-field-outlined-focus-outline-color: #{$primary};
+  --mat-form-field-outlined-label-text-color: #{$text-muted};
+  --mat-form-field-outlined-focus-label-text-color: #{$primary};
+  --mat-form-field-outlined-input-text-color: #{$text-dark};
+  --mat-form-field-outlined-error-outline-color: #{$danger};
+  --mat-form-field-outlined-container-shape: #{$radius-lg};
+  --mdc-outlined-text-field-container-shape: #{$radius-lg};
+  --mat-radio-checked-ripple-color: #{$primary};
+  --mdc-radio-selected-icon-color: #{$primary};
+  --mdc-radio-selected-hover-icon-color: #{$primary-dark};
+  --mdc-radio-selected-focus-icon-color: #{$primary};
+  --mdc-radio-selected-pressed-icon-color: #{$primary};
+}
+
+body { color: $text-dark; -webkit-font-smoothing: antialiased; }
+
+// Foco visível em tudo que é interativo
+:focus-visible {
+  outline: 3px solid $focus-ring;
+  outline-offset: 2px;
+  border-radius: $radius-sm;
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+// Valores monetários alinhados
+.amount { font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+
+// ---------- Botões de ícone (alvo de toque >= 44px) ----------
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: $touch-target;
+  height: $touch-target;
+  padding: 0;
+  border: none;
+  border-radius: $radius-lg;
+  background: transparent;
+  color: $text-muted;
+  cursor: pointer;
+  transition: background-color 0.2s $ease-smooth, color 0.2s $ease-smooth, transform 0.1s;
+
+  mat-icon { color: inherit !important; font-size: 24px; width: 24px; height: 24px; }
+
+  &:hover { background-color: $primary-light; color: $primary; }
+  &:active { transform: scale(0.94); }
+  &.danger:hover { background-color: $danger-light; color: $danger; }
+  &.add { background-color: $primary-light; color: $primary; &:hover { background-color: #E6D6FA; } }
+}
+
+// ---------- Modais: bottom sheet no mobile, diálogo no desktop ----------
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background-color: $overlay;
+  overflow: hidden;
+  animation: modal-fade 0.2s $ease-out;
+
+  @include tablet {
+    align-items: center;
+    padding: $spacing-lg;
+  }
+}
+
+.modal-content {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  max-height: 92vh;
+  max-height: 92dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  box-sizing: border-box;
+  padding: $spacing-lg $spacing-lg calc(#{$spacing-md} + env(safe-area-inset-bottom, 0px));
+  background-color: $white;
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0 -8px 32px rgba(31, 20, 56, 0.25);
+  animation: modal-sheet-up 0.28s $ease-out;
+
+  // alça de arraste (indica "bottom sheet" no mobile)
+  &::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 4px;
+    margin: -$spacing-sm auto $spacing-md;
+    border-radius: 2px;
+    background-color: #D9CDEB;
+  }
+
+  @include tablet {
+    padding: $spacing-xl;
+    border-radius: 24px;
+    box-shadow: $shadow-lg;
+    animation-name: modal-pop;
+
+    &::before { display: none; }
+  }
+
+  h2 {
+    margin: 0;
+    color: $primary-dark;
+    font-family: 'Asap', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .modal-text {
+    margin: $spacing-sm 0 0;
+    color: $text-muted;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  form {
+    display: block;
+    margin-top: $spacing-lg;
+    padding: 0;
+
+    mat-form-field { width: 100%; }
+
+    // grupos "Recorrente / Ativo" (rótulo + radios)
+    > div:not([class]) {
+      margin-bottom: $spacing-md;
+
+      > label {
+        display: block;
+        margin-bottom: $spacing-xs;
+        color: $text-muted;
+        font-size: 14px;
+        font-weight: 500;
+      }
+    }
+
+    mat-radio-group { display: flex; flex-wrap: wrap; gap: $spacing-xs $spacing-md; }
+  }
+}
+
+// Ações do modal: rodapé fixo, secundária à esquerda e primária à direita
+.revenue-buttons,
+.card-buttons,
+.modal-actions {
+  position: sticky;
+  bottom: calc(-1 * (#{$spacing-md} + env(safe-area-inset-bottom, 0px)));
+  display: flex;
+  gap: $spacing-sm;
+  margin-top: $spacing-md;
+  padding: $spacing-md 0 0;
+  background: linear-gradient(to bottom, rgba($white, 0), $white 24%);
+
+  button {
+    flex: 1;
+    min-height: 48px;
+    margin: 0;
+    padding: 0 $spacing-md;
+    border: none;
+    border-radius: $radius-lg;
+    background-color: $primary;
+    color: $white;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    order: 1;
+    transition: background-color 0.2s $ease-smooth, transform 0.1s, box-shadow 0.2s;
+
+    &:hover { background-color: $primary-dark; }
+    &:active { transform: scale(0.98); }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    &.cancel {
+      order: 0;
+      background-color: $primary-light;
+      color: $primary-dark;
+      &:hover { background-color: #E6D6FA; }
+    }
+
+    &.danger { background-color: $danger; &:hover { background-color: #8A0000; } }
+  }
+}
+
+// Botão primário genérico das telas (Novo Cartão, + Ativo, etc.)
+.btn-primary {
+  min-height: 44px;
+  padding: 0 $spacing-md;
+  border: none;
+  border-radius: $radius-lg;
+  background-color: $primary;
+  color: $white;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s $ease-smooth, transform 0.1s;
+  &:hover { background-color: $primary-dark; }
+  &:active { transform: scale(0.97); }
+}
+
+@keyframes modal-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modal-sheet-up { from { transform: translateY(40px); opacity: 0.6; } to { transform: none; opacity: 1; } }
+@keyframes modal-pop { from { transform: translateY(12px) scale(0.98); opacity: 0; } to { transform: none; opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+body.modal-open { overflow: hidden; }

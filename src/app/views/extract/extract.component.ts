@@ -1,3 +1,4 @@
+import { ModalDirective } from '../../directives/modal.directive';
 import { Component, Input, OnInit } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -26,6 +27,7 @@ import { DashboardChartComponent } from '../../components/dashboard-chart/dashbo
 @Component({
   selector: 'app-extract',
   imports: [
+    ModalDirective,
     CommonModule,
     MatFormFieldModule,
     MatInputModule,

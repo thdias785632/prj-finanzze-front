@@ -38,7 +38,7 @@
                                 <td>{{ item.referenceDate | date: 'dd/MM' }}</td>
                                 <td>{{ item.category }}</td>
                                 <td>{{ item.installments > 0 ? item.installmentsActual + '/' + item.installments : '-' }}</td>
-                                <td><mat-icon (click)="toggleCardExpenssesDeleteModal(item)">delete</mat-icon></td>
+                                <td><button type="button" class="icon-btn danger" [attr.aria-label]="'Remover ' + item.name" (click)="toggleCardExpenssesDeleteModal(item)"><mat-icon aria-hidden="true">delete</mat-icon></button></td>
                             </tr>
                         </tbody>
                     </table>
@@ -53,18 +53,18 @@
     </section>
 </div>
 
-<div class="modal" *ngIf="showCreateCardModal">
+<div class="modal" appModal *ngIf="showCreateCardModal">
     <div class="modal-content">
         <h2>Criar Cartão</h2>
         <form [formGroup]="cardForm" (ngSubmit)="onCreateCard()">
             <mat-form-field appearance="outline">
                 <mat-label>Nome</mat-label>
-                <input matInput type="text" formControlName="name" name="name">
+                <input matInput type="text" formControlName="name" name="name" autocomplete="off">
             </mat-form-field>
             
             <mat-form-field appearance="outline">
                 <mat-label>Bandeira</mat-label>
-                <input matInput type="text" formControlName="flag" name="flag">
+                <input matInput type="text" formControlName="flag" name="flag" autocomplete="off">
             </mat-form-field>
             
             <div>
@@ -83,7 +83,7 @@
     </div>
 </div>
 
-<div class="modal" *ngIf="showDeleteCardExpenssesModal && cardExpenssesToDelete">
+<div class="modal" appModal *ngIf="showDeleteCardExpenssesModal && cardExpenssesToDelete">
     <div class="modal-content">
         <h2>Deseja Remover o Item?</h2>
 

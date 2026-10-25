@@ -46,7 +46,7 @@ $bottom-nav-h: 56px;
     min-width: 48px;
     min-height: 48px;
     text-decoration: none;
-    color: rgba($white, 0.6);
+    color: rgba($white, 0.82);
     cursor: pointer;
     transition: all 0.3s $ease-smooth;
     border-radius: $radius-md;
@@ -85,7 +85,7 @@ $bottom-nav-h: 56px;
 
     // LABEL
     .label {
-      font-size: 10px;
+      font-size: 12px;
       font-weight: 600;
       font-family: 'Asap', sans-serif;
       letter-spacing: 0.3px;

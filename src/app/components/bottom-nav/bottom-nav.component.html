@@ -1,11 +1,13 @@
 <!-- BOTTOM NAVIGATION - MOBILE FIRST -->
-<nav class="bottom-navigation">
+<nav class="bottom-navigation" aria-label="Navegação principal">
   <a 
     *ngFor="let route of routes"
     [routerLink]="route.path"
     routerLinkActive="active"
+    ariaCurrentWhenActive="page"
     [routerLinkActiveOptions]="{exact: route.exact || false}"
     class="nav-item"
+    [attr.aria-label]="route.label"
     >
     
     <!-- Ícone -->
