@@ -5,7 +5,7 @@
   min-height: 100vh;
   margin: 0;
   padding: $spacing-md $spacing-md $spacing-2xl;
-  padding-bottom: 150px !important;
+  padding-bottom: 160px !important;
 
   @include tablet {
     padding: $spacing-lg $spacing-xl $spacing-2xl;
@@ -23,15 +23,15 @@
     @include content-container-wide;
   }
   
-  button {
-    height: 35px;
+  button:not(.icon-btn) {
+    min-height: $touch-target;
+    padding: 0 $spacing-md;
     background-color: $primary;
     color: $white;
     border: none;
-    border-radius: $radius-sm;
+    border-radius: $radius-lg;
     font-size: 16px;
-    font-weight: 500;
-    text-align: center;
+    font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s $ease-smooth, transform 0.1s;
 
@@ -46,19 +46,21 @@
 }
 
 .new-card {
-  padding: $spacing-md;
+  padding: $spacing-md 0;
   text-align: center;
 
   button {
-    height: 35px;
+    min-height: 48px;
+    padding: 0 $spacing-lg;
     background-color: $primary;
     color: $white;
     border: none;
-    border-radius: $radius-sm;
+    border-radius: $radius-lg;
     font-size: 16px;
-    font-weight: 500;
-    text-align: center;
+    font-weight: 600;
     cursor: pointer;
+
+    &:hover { background-color: $primary-dark; }
   }
 }
 
@@ -78,7 +80,7 @@ h2 {
   color: $primary;
   font-size: 16px;
   margin: 0;
-  font-weight: 300;
+  font-weight: 500;
   font-family: 'Asap', sans-serif;
 }
 
@@ -86,7 +88,7 @@ h3 {
   color: $primary;
   font-size: 12px;
   margin: 0;
-  font-weight: 300;
+  font-weight: 500;
   font-family: 'Asap', sans-serif;
 }
 
@@ -121,7 +123,7 @@ h3 {
   flex-direction: column;
   justify-content: start;
   padding: $spacing-md;
-  border-radius: $radius-md;
+  border-radius: $radius-xl;
   background-color: $white;
   box-shadow: $shadow-md;
   transition: box-shadow 0.2s $ease-smooth;
@@ -174,49 +176,41 @@ h3 {
   color: $green-500;
 }
 
+.header h2 { font-size: 17px; font-weight: 600; color: $primary-dark; }
+
 .revenue-item, .expenses-item {
   display: flex;
-  justify-content: start;
   align-items: center;
   width: 100%;
+  min-height: 52px;
   gap: $spacing-sm;
+  border-bottom: 1px solid $border-soft;
+
+  &:last-of-type { border-bottom: none; }
+
+  // nome (esquerda) / valor (direita) / ações
+  h2 {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: $text-dark;
+    font-size: 15px;
+    font-weight: 500;
+  }
 
   p {
-    margin-bottom: 0;
-    width: 35%;
-    min-width: 100px;
-    font-size: 14px;
-
-    @include tablet {
-      width: 30%;
-      font-size: 15px;
-    }
+    margin: 0;
+    order: 2;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
   }
 
-  h2 {
-    margin-bottom: 0;
-    flex: 1;
-    font-size: 14px;
-
-    @include tablet {
-      font-size: 15px;
-    }
-  }
-}
-
-.expenses-item p {
-  min-width: 100px;
-}
-
-mat-icon {
-  color: rgba($text-muted, 0.3);
-  font-size: 24px;
-  cursor: pointer;
-  transition: color 0.2s;
-
-  &:hover {
-    color: rgba($text-muted, 0.7);
-  }
+  .extract-table-actions, > .icon-btn { order: 3; }
 }
 
 .expenses {
@@ -248,93 +242,35 @@ mat-icon {
 }
 
 // Modals
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  overflow: hidden;
-}
-
-.modal-content {
-  background-color: $white;
-  padding: $spacing-lg;
-  border-radius: $radius-lg;
-  width: 100%;
-  max-width: 480px;
-  box-shadow: $shadow-lg;
-
-  @include tablet {
-    padding: $spacing-xl;
-  }
-
-  h2 {
-    font-weight: bold;
-    font-size: 19px;
-  }
-
-  form {
-    margin-top: $spacing-xl;
-
-    mat-form-field {
-      width: 100%;
-    }
-  }
-}
-
-.revenue-buttons {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: $spacing-sm;
-
-  button {
-    flex: 1;
-    height: 40px;
-    border-radius: $radius-sm;
-    background-color: $primary;
-    color: $white;
-    border: none;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: $spacing-md;
-    margin-bottom: $spacing-md;
-  }
-
-  .cancel {
-    background-color: $primary-light;
-    color: $primary;
-  }
-}
-
 .footer {
   position: fixed;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: $spacing-md;
+  padding: $spacing-xs $spacing-sm;
   background-color: $white;
-  color: $primary;
-  bottom: $bottom-nav-height;
+  color: $primary-dark;
+  bottom: calc(#{$bottom-nav-height} + env(safe-area-inset-bottom, 0px));
   left: 0;
   width: 100%;
-  height: 55px;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+  height: 56px;
+  border-top: 1px solid $border-soft;
+  box-shadow: 0 -4px 16px rgba(31, 20, 56, 0.12);
   z-index: 10;
   box-sizing: border-box;
+
+  span {
+    font-size: 16px;
+    font-weight: 600;
+    text-transform: capitalize;
+    font-variant-numeric: tabular-nums;
+  }
 
   @include tablet {
     max-width: $content-max-width;
     left: 50%;
     transform: translateX(-50%);
-    border-radius: $radius-md $radius-md 0 0;
+    border-radius: $radius-lg $radius-lg 0 0;
   }
 }
 
@@ -342,52 +278,33 @@ mat-icon {
   color: $primary;
 }
 
-.modal-expensses, .modal-category {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-}
-
-.content-expensses, .content-category {
-  background-color: $white;
-  border-radius: $radius-lg;
-  width: 90%;
-  max-width: 520px;
-  max-height: 80%;
-  overflow-y: auto;
-  box-shadow: $shadow-lg;
-  padding: 0;
-
-  form {
-    padding: $spacing-sm $spacing-md $spacing-md;
-  }
-}
-
-.content-category h2 {
-  padding: $spacing-md;
-}
-
 .modal-expensses-header {
   display: flex;
-  justify-content: space-between;
-  align-items: end;
-  margin-bottom: $spacing-md;
-  height: 45px;
-  text-align: center;
-  box-shadow: $shadow-sm;
-  
-  h2 {
-    width: 50%;
-    border-bottom: 4px solid transparent;
-    padding: $spacing-sm;
-    cursor: pointer;
-    transition: border-color 0.2s;
-  }
-}
+  gap: $spacing-xs;
+  margin: 0 0 $spacing-md;
+  padding: $spacing-xs;
+  border-radius: $radius-lg;
+  background-color: $primary-light;
 
-.active {
-  border-bottom: 4px solid $primary !important;
+  button {
+    flex: 1;
+    min-height: 44px;
+    border: none;
+    border-radius: $radius-md;
+    background: transparent;
+    color: $text-muted;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s $ease-smooth, color 0.2s $ease-smooth;
+
+    &.active {
+      background-color: $white;
+      color: $primary-dark;
+      box-shadow: $shadow-sm;
+    }
+  }
 }
 
 .chart-extract__item {
@@ -395,9 +312,7 @@ mat-icon {
 }
 
 .modal-card-extract {
-  height: 63%;
-  overflow-y: scroll;
-  overflow-x: hidden;
+  max-width: 720px;
 }
 
 .extract-table {
@@ -412,7 +327,7 @@ mat-icon {
     th, td {
       padding: $spacing-sm $spacing-md;
       text-align: left;
-      border-bottom: 1px solid #ddd;
+      border-bottom: 1px solid $border-soft;
       white-space: nowrap;
 
       @include tablet {
@@ -432,47 +347,25 @@ mat-icon {
     }
 
     tr:hover {
-      background-color: #f1f1f1;
+      background-color: $primary-light;
     }
+
+    td:nth-child(2) { font-variant-numeric: tabular-nums; font-weight: 600; }
   }
 }
 
 .extract-table-actions {
   display: flex;
-  gap: $spacing-xs;
+  gap: $spacing-sm;
+  align-items: center;
 }
 
 .modal-card-extract-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: $spacing-md;
-}
-
-.card-buttons {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   gap: $spacing-sm;
-
-  button {
-    flex: 1;
-    height: 40px;
-    border-radius: $radius-sm;
-    background-color: $primary;
-    color: $white;
-    border: none;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: $spacing-md;
-    margin-bottom: $spacing-md;
-  }
-
-  .cancel {
-    background-color: $primary-light;
-    color: $primary;
-  }
+  margin-bottom: $spacing-sm;
 }
 
 .send-extract {

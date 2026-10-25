@@ -10,13 +10,13 @@
                     <div class="header">
                         <h2>Entradas do mês</h2>
                 
-                        <mat-icon (click)="toggleOpenRevenueModal()">add</mat-icon>
+                        <button type="button" class="icon-btn add" aria-label="Adicionar entrada" (click)="toggleOpenRevenueModal()"><mat-icon aria-hidden="true">add</mat-icon></button>
                     </div>
                     
                     <div *ngFor="let revenue of userExtract.revenues" class="revenue-item">
-                        <p>R$ {{ revenue.value | number: '1.2-2' }}</p>
                         <h2>{{revenue.name}}</h2>
-                        <mat-icon (click)="toggleRevenueDeleteModal(revenue)">delete</mat-icon>
+                        <p class="amount"><span class="sr-only">Entrada de </span>+ R$ {{ revenue.value | number: '1.2-2' }}</p>
+                        <button type="button" class="icon-btn danger" [attr.aria-label]="'Remover ' + revenue.name" (click)="toggleRevenueDeleteModal(revenue)"><mat-icon aria-hidden="true">delete</mat-icon></button>
                     </div>
 
                     <hr/>
@@ -31,21 +31,21 @@
                     <div class="header">
                         <h2>Saídas do mês</h2>
 
-                        <mat-icon (click)="toggleOpenExpenssesModal()">add</mat-icon>
+                        <button type="button" class="icon-btn add" aria-label="Adicionar saída" (click)="toggleOpenExpenssesModal()"><mat-icon aria-hidden="true">add</mat-icon></button>
                     </div>
                     <div *ngFor="let expense of userExtract.fixedExpensess" class="expenses-item">
-                        <p [class.inactive]="!expense.active && hasReferenceDatePresente()">R$ {{ expense.value | number: '1.2-2' }} <span *ngIf="!expense.active && hasReferenceDatePresente()">*</span></p>
-                        <h2>{{expense.name}}</h2>
+                        <h2 [class.inactive]="!expense.active && hasReferenceDatePresente()">{{expense.name}}</h2>
+                        <p class="amount" [class.inactive]="!expense.active && hasReferenceDatePresente()"><span class="sr-only">Saída de </span>− R$ {{ expense.value | number: '1.2-2' }} <span *ngIf="!expense.active && hasReferenceDatePresente()">*</span></p>
                         <div class="extract-table-actions">
-                            <mat-icon (click)="toggleExpenssesDeleteModal(expense)">delete</mat-icon>
-                            <mat-icon (click)="openExpenssesEditModal(expense)">edit</mat-icon>
+                            <button type="button" class="icon-btn danger" [attr.aria-label]="'Remover ' + expense.name" (click)="toggleExpenssesDeleteModal(expense)"><mat-icon aria-hidden="true">delete</mat-icon></button>
+                            <button type="button" class="icon-btn" [attr.aria-label]="'Editar ' + expense.name" (click)="openExpenssesEditModal(expense)"><mat-icon aria-hidden="true">edit</mat-icon></button>
                         </div>
                     </div>
 
                     <div class="expenses-item" *ngIf="userExtract.totalCardExpensess">
-                        <p>R$ {{ userExtract.totalCardExpensess | number: '1.2-2' }}</p>
                         <h2>Cartão de Crédito</h2>
-                        <mat-icon (click)="showCardExtractModal = true">visibility</mat-icon>
+                        <p class="amount"><span class="sr-only">Saída de </span>− R$ {{ userExtract.totalCardExpensess | number: '1.2-2' }}</p>
+                        <button type="button" class="icon-btn" aria-label="Ver extrato do cartão" (click)="showCardExtractModal = true"><mat-icon aria-hidden="true">visibility</mat-icon></button>
                     </div>
 
                     <hr/>
@@ -78,23 +78,23 @@
     </section>
 </div>
 
-<div class="modal" *ngIf="showRevenueModal">
+<div class="modal" appModal *ngIf="showRevenueModal">
     <div class="modal-content">
         <h2>Adicionar Receita</h2>
         <form [formGroup]="revenueForm" (ngSubmit)="onAddRevenue()">
             <mat-form-field appearance="outline">
                 <mat-label>Data de Referência</mat-label>
-                <input matInput type="date" formControlName="referenceDate" name="date">
+                <input matInput type="date" formControlName="referenceDate" name="date" autocomplete="off">
             </mat-form-field>
             
             <mat-form-field appearance="outline">
-                <mat-label>Nomde da Entrada</mat-label>
-                <input matInput type="text" formControlName="name" name="name">
+                <mat-label>Nome da entrada</mat-label>
+                <input matInput type="text" formControlName="name" name="name" autocomplete="off">
             </mat-form-field>
             
             <mat-form-field appearance="outline">
                 <mat-label>Valor</mat-label>
-                <input matInput type="number" formControlName="value" name="value">
+                <input matInput type="number" inputmode="decimal" step="any" formControlName="value" name="value" autocomplete="off">
             </mat-form-field>
             
             <div>
@@ -113,38 +113,39 @@
     </div>
 </div>
 
-<div class="modal" *ngIf="showDeleteRevenueModal && revenueToDelete">
+<div class="modal" appModal *ngIf="showDeleteRevenueModal && revenueToDelete">
     <div class="modal-content">
-        <h2>Deseja Remover {{revenueToDelete.name}} ?</h2>
+        <h2>Remover {{revenueToDelete.name}}?</h2>
+        <p class="modal-text">Essa ação não pode ser desfeita.</p>
 
         <div class="revenue-buttons">
-            <button class="save" type="button" (click)="onRemoveRevenue()">Remover</button>
+            <button class="danger" type="button" (click)="onRemoveRevenue()">Remover</button>
             <button class="cancel" type="button" (click)="toggleRevenueDeleteModal()">Cancelar</button>
         </div>
     </div>
 </div>
 
-<div class="modal modal-expensses" *ngIf="showExpenssesModal">
+<div class="modal modal-expensses" appModal *ngIf="showExpenssesModal">
     <div class="modal-content content-expensses">
-        <div class="modal-expensses-header" *ngIf="!editExpenssesMode">
-            <h2 [ngClass]="{ active: !showExpensses }" (click)="showExpensses = false">Cartão</h2>
-            <h2 [ngClass]="{ active: showExpensses }" (click)="showExpensses = true">Outras</h2>
+        <div class="modal-expensses-header" appModal *ngIf="!editExpenssesMode">
+            <button type="button" role="tab" [attr.aria-selected]="!showExpensses" [ngClass]="{ active: !showExpensses }" (click)="showExpensses = false">Cartão</button>
+            <button type="button" role="tab" [attr.aria-selected]="showExpensses" [ngClass]="{ active: showExpensses }" (click)="showExpensses = true">Outras</button>
         </div>
 
         <form *ngIf="showExpensses" [formGroup]="editExpenssesMode ? expenssesEditForm : expenssesForm" (ngSubmit)="editExpenssesMode ? onEditExpensses() : onAddExpensses()">
             <mat-form-field appearance="outline">
                 <mat-label>Data de Referência</mat-label>
-                <input matInput type="date" formControlName="referenceDate" name="date">
+                <input matInput type="date" formControlName="referenceDate" name="date" autocomplete="off">
             </mat-form-field>
             
             <mat-form-field appearance="outline">
-                <mat-label>Nome da Saída</mat-label>
-                <input matInput type="text" formControlName="name" name="name">
+                <mat-label>Nome da saída</mat-label>
+                <input matInput type="text" formControlName="name" name="name" autocomplete="off">
             </mat-form-field>
             
             <mat-form-field appearance="outline">
                 <mat-label>Valor</mat-label>
-                <input matInput type="number" formControlName="value" name="value">
+                <input matInput type="number" inputmode="decimal" step="any" formControlName="value" name="value" autocomplete="off">
             </mat-form-field>
 
             <mat-form-field appearance="outline">
@@ -191,17 +192,17 @@
 
             <mat-form-field appearance="outline">
                 <mat-label>Data de Referência</mat-label>
-                <input matInput type="date" formControlName="referenceDate" name="date">
+                <input matInput type="date" formControlName="referenceDate" name="date" autocomplete="off">
             </mat-form-field>
             
             <mat-form-field appearance="outline">
-                <mat-label>Nome da Saída</mat-label>
-                <input matInput type="text" formControlName="name" name="name">
+                <mat-label>Nome da saída</mat-label>
+                <input matInput type="text" formControlName="name" name="name" autocomplete="off">
             </mat-form-field>
             
             <mat-form-field appearance="outline">
                 <mat-label>Valor</mat-label>
-                <input matInput type="number" formControlName="value" name="value">
+                <input matInput type="number" inputmode="decimal" step="any" formControlName="value" name="value" autocomplete="off">
             </mat-form-field>
 
             <mat-form-field appearance="outline">
@@ -216,7 +217,7 @@
     
             <mat-form-field appearance="outline">
                 <mat-label>Parcelas</mat-label>
-                <input matInput type="number" formControlName="installments" name="installments">
+                <input matInput type="number" inputmode="numeric" step="1" formControlName="installments" name="installments" autocomplete="off">
             </mat-form-field>
 
             <div *ngIf="editExpenssesMode">
@@ -247,14 +248,14 @@
     </div>
 </div>
 
-<div class="modal modal-category" *ngIf="showCategoryModal">
+<div class="modal modal-category" appModal *ngIf="showCategoryModal">
     <div class="modal-content content-category">
         <h2>Adicionar Categoria</h2>
 
         <form [formGroup]="categoryForm" (ngSubmit)="onAddCategory()">
             <mat-form-field appearance="outline">
                 <mat-label>Nome da Categoria</mat-label>
-                <input matInput type="text" formControlName="name" name="name">
+                <input matInput type="text" formControlName="name" name="name" autocomplete="off">
             </mat-form-field>
 
             <div class="revenue-buttons">
@@ -265,22 +266,23 @@
     </div>
 </div>
 
-<div class="modal" *ngIf="showDeleteExpenssesModal && expenssesToDelete">
+<div class="modal" appModal *ngIf="showDeleteExpenssesModal && expenssesToDelete">
     <div class="modal-content">
-        <h2>Deseja Remover {{expenssesToDelete.name}} ?</h2>
+        <h2>Remover {{expenssesToDelete.name}}?</h2>
+        <p class="modal-text">Essa ação não pode ser desfeita.</p>
 
         <div class="revenue-buttons">
-            <button class="save" type="button" (click)="onRemoveExpensses()">Remover</button>
+            <button class="danger" type="button" (click)="onRemoveExpensses()">Remover</button>
             <button class="cancel" type="button" (click)="toggleExpenssesDeleteModal()">Cancelar</button>
         </div>
     </div>
 </div>
 
-<div class="modal" *ngIf="showCardExtractModal">
+<div class="modal" appModal *ngIf="showCardExtractModal">
     <div class="modal-content modal-card-extract">
         <div class="modal-card-extract-header">
             <h2>Extrato Cartão</h2>
-            <mat-icon (click)="showCardExtractModal = false">close</mat-icon>
+            <button type="button" class="icon-btn" data-modal-close aria-label="Fechar" (click)="showCardExtractModal = false"><mat-icon aria-hidden="true">close</mat-icon></button>
         </div>
 
         <div class="extract-table">
@@ -299,8 +301,8 @@
                         <td>{{ item.value | number: '1.2-2' }}</td>
                         <td>{{ item.category }}</td>
                         <td class="extract-table-actions">
-                            <mat-icon (click)="toggleCardExpenssesDeleteModal(item)">delete</mat-icon>
-                            <mat-icon (click)="openCardExpenssesEditModal(item)">edit</mat-icon>
+                            <button type="button" class="icon-btn danger" [attr.aria-label]="'Remover ' + item.name" (click)="toggleCardExpenssesDeleteModal(item)"><mat-icon aria-hidden="true">delete</mat-icon></button>
+                            <button type="button" class="icon-btn" [attr.aria-label]="'Editar ' + item.name" (click)="openCardExpenssesEditModal(item)"><mat-icon aria-hidden="true">edit</mat-icon></button>
                         </td>
                     </tr>
                 </tbody>
@@ -316,25 +318,26 @@
     </div>
 </div>
 
-<div class="modal" *ngIf="showDeleteCardExpenssesModal && cardExpenssesToDelete">
+<div class="modal" appModal *ngIf="showDeleteCardExpenssesModal && cardExpenssesToDelete">
     <div class="modal-content">
-        <h2>Deseja Remover o Item?</h2>
+        <h2>Remover este item?</h2>
+        <p class="modal-text">Essa ação não pode ser desfeita.</p>
 
         <div class="card-buttons">
-            <button class="save" type="button" (click)="onRemoveCardExpensses()">Remover</button>
+            <button class="danger" type="button" (click)="onRemoveCardExpensses()">Remover</button>
             <button class="cancel" type="button" (click)="toggleCardExpenssesDeleteModal()">Cancelar</button>
         </div>
     </div>
 </div>
 
-<footer class="footer">
-    <button mat-icon-button (click)="changeMonth(-1)">
+<footer class="footer" aria-label="Seletor de mês">
+    <button mat-icon-button type="button" aria-label="Mês anterior" (click)="changeMonth(-1)">
         <mat-icon>arrow_back</mat-icon>
     </button>
 
-    <span>{{ referenceDate | date: 'MMM yyyy' }}</span>
+    <span aria-live="polite">{{ referenceDate | date: 'MMM yyyy' }}</span>
     
-    <button mat-icon-button (click)="changeMonth(1)">
+    <button mat-icon-button type="button" aria-label="Próximo mês" (click)="changeMonth(1)">
         <mat-icon>arrow_forward</mat-icon>
     </button>
 </footer>

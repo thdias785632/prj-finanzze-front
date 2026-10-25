@@ -1,3 +1,4 @@
+import { ModalDirective } from '../../directives/modal.directive';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -31,6 +32,7 @@ import { environment } from '../../../environments/environment';
 @Component({
   selector: 'app-investimento',
   imports: [
+    ModalDirective,
     CommonModule,
     MatFormFieldModule,
     MatInputModule,

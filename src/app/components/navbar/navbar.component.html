@@ -6,16 +6,16 @@
   </div>
 
   <!-- User Menu (direita) -->
-  <div class="user-icon" (click)="toggleUserMenu()">
-    <mat-icon aria-hidden="false" aria-label="User icon">person</mat-icon>
+  <div class="user-icon" role="button" tabindex="0" aria-label="Menu do usuário" aria-haspopup="menu" [attr.aria-expanded]="userMenuOpen" (click)="toggleUserMenu()" (keydown.enter)="toggleUserMenu()" (keydown.space)="$event.preventDefault(); toggleUserMenu()">
+    <mat-icon aria-hidden="true">person</mat-icon>
 
     <!-- Dropdown do usuário -->
     <div class="dropdown-menu" [class.open]="userMenuOpen">
-      <a class="dropdown-item" (click)="goToProfile()">
+      <a class="dropdown-item" role="menuitem" tabindex="0" (click)="goToProfile()" (keydown.enter)="goToProfile()">
         <mat-icon>account_circle</mat-icon>
         <span>Perfil</span>
       </a>
-      <a class="dropdown-item logout" (click)="logout()">
+      <a class="dropdown-item logout" role="menuitem" tabindex="0" (click)="logout()" (keydown.enter)="logout()">
         <mat-icon>logout</mat-icon>
         <span>Sair</span>
       </a>

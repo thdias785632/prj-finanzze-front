@@ -24,15 +24,15 @@
     @include content-container-wide;
   }
   
-  button {
-    height: 35px;
+  button:not(.icon-btn) {
+    min-height: $touch-target;
     margin-top: $spacing-sm;
     background-color: $primary;
     color: $white;
     border: none;
-    border-radius: $radius-sm;
-    font-size: 14px;
-    font-weight: 500;
+    border-radius: $radius-lg;
+    font-size: 15px;
+    font-weight: 600;
     text-align: center;
     cursor: pointer;
     padding: 0 $spacing-md;
@@ -64,7 +64,7 @@ h2 {
   color: $primary;
   font-size: 16px;
   margin: 0;
-  font-weight: 300;
+  font-weight: 500;
   font-family: 'Asap', sans-serif;
 }
 
@@ -72,7 +72,7 @@ h3 {
   color: $primary;
   font-size: 12px;
   margin: 0;
-  font-weight: 300;
+  font-weight: 500;
   font-family: 'Asap', sans-serif;
 }
 
@@ -158,72 +158,6 @@ h3 {
 }
 
 // Modal
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  overflow: hidden;
-}
-
-.modal-content {
-  background-color: $white;
-  padding: $spacing-lg;
-  border-radius: $radius-lg;
-  width: 70%;
-  max-width: 480px;
-  box-shadow: $shadow-lg;
-
-  @include tablet {
-    padding: $spacing-xl;
-  }
-
-  h2 {
-    font-weight: bold;
-    font-size: 19px;
-  }
-
-  form {
-    margin-top: $spacing-xl;
-
-    mat-form-field {
-      width: 100%;
-    }
-  }
-}
-
-.card-buttons {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: $spacing-sm;
-
-  button {
-    flex: 1;
-    height: 40px;
-    border-radius: $radius-sm;
-    background-color: $primary;
-    color: $white;
-    border: none;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: $spacing-md;
-    margin-bottom: $spacing-md;
-  }
-
-  .cancel {
-    background-color: $primary-light;
-    color: $primary;
-  }
-}
-
 .footer {
   position: fixed;
   display: flex;

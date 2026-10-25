@@ -56,7 +56,7 @@
         </div>
         <div class="categoria-actions">
           <span class="categoria-total">R$ {{ categoria.totalCategoria | number: '1.2-2' }}</span>
-          <mat-icon (click)="toggleDeleteCategoriaModal(categoria)">delete</mat-icon>
+          <button type="button" class="icon-btn danger" [attr.aria-label]="'Remover ' + categoria.name" (click)="toggleDeleteCategoriaModal(categoria)"><mat-icon aria-hidden="true">delete</mat-icon></button>
         </div>
       </div>
 
@@ -108,8 +108,8 @@
               <span class="pct-tag meta">Meta: {{ ativo.targetPercentage | number: '1.1-1' }}%</span>
             </div>
             <div class="ativo-actions">
-              <mat-icon (click)="openEditInvestimento(ativo)">edit</mat-icon>
-              <mat-icon (click)="toggleDeleteInvestimentoModal(ativo)">delete</mat-icon>
+              <button type="button" class="icon-btn" [attr.aria-label]="'Editar ' + ativo.name" (click)="openEditInvestimento(ativo)"><mat-icon aria-hidden="true">edit</mat-icon></button>
+              <button type="button" class="icon-btn danger" [attr.aria-label]="'Remover ' + ativo.name" (click)="toggleDeleteInvestimentoModal(ativo)"><mat-icon aria-hidden="true">delete</mat-icon></button>
             </div>
           </div>
 
@@ -125,17 +125,17 @@
 </div>
 
 <!-- MODAL: NOVA CATEGORIA -->
-<div class="modal" *ngIf="showCategoriaModal">
+<div class="modal" appModal *ngIf="showCategoriaModal">
   <div class="modal-content">
     <h2>Nova Categoria</h2>
     <form [formGroup]="categoriaForm">
       <mat-form-field appearance="outline">
         <mat-label>Nome da categoria</mat-label>
-        <input matInput formControlName="name" placeholder="Ex: Renda Fixa" />
+        <input matInput formControlName="name" placeholder="Ex: Renda Fixa" autocomplete="off" />
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>% ideal na carteira</mat-label>
-        <input matInput type="number" formControlName="targetPercentage" min="0" max="100" />
+        <input matInput type="number" inputmode="decimal" step="any" formControlName="targetPercentage" min="0" max="100" autocomplete="off" />
       </mat-form-field>
     </form>
     <div class="revenue-buttons">
@@ -146,7 +146,7 @@
 </div>
 
 <!-- MODAL: NOVO/EDITAR ATIVO -->
-<div class="modal" *ngIf="showInvestimentoModal">
+<div class="modal" appModal *ngIf="showInvestimentoModal">
   <div class="modal-content">
     <h2>{{ editInvestimentoMode ? 'Editar Ativo' : 'Novo Ativo' }}</h2>
     <form [formGroup]="investimentoForm">
@@ -160,12 +160,12 @@
 
       <mat-form-field appearance="outline">
         <mat-label>Nome do ativo (ex: PETR4)</mat-label>
-        <input matInput formControlName="name" />
+        <input matInput formControlName="name" autocomplete="off" />
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>% ideal na categoria</mat-label>
-        <input matInput type="number" formControlName="targetPercentage" min="0" max="100" />
+        <input matInput type="number" inputmode="decimal" step="any" formControlName="targetPercentage" min="0" max="100" autocomplete="off" />
       </mat-form-field>
 
       <p class="secao-label">Preços e quantidade <span>(opcional)</span></p>
@@ -173,22 +173,22 @@
       <div class="form-row">
         <mat-form-field appearance="outline">
           <mat-label>Quantidade</mat-label>
-          <input matInput type="number" formControlName="quantity" min="0" />
+          <input matInput type="number" inputmode="decimal" step="any" formControlName="quantity" min="0" autocomplete="off" />
         </mat-form-field>
         <mat-form-field appearance="outline">
           <mat-label>Preço médio (R$)</mat-label>
-          <input matInput type="number" formControlName="averagePrice" min="0" />
+          <input matInput type="number" inputmode="decimal" step="any" formControlName="averagePrice" min="0" autocomplete="off" />
         </mat-form-field>
       </div>
 
       <div class="form-row">
         <mat-form-field appearance="outline">
           <mat-label>Preço atual (R$)</mat-label>
-          <input matInput type="number" formControlName="currentPrice" min="0" />
+          <input matInput type="number" inputmode="decimal" step="any" formControlName="currentPrice" min="0" autocomplete="off" />
         </mat-form-field>
         <mat-form-field appearance="outline">
           <mat-label>Valor total (R$)</mat-label>
-          <input matInput type="number" formControlName="currentValue" min="0" />
+          <input matInput type="number" inputmode="decimal" step="any" formControlName="currentValue" min="0" autocomplete="off" />
         </mat-form-field>
       </div>
 
@@ -201,14 +201,14 @@
 </div>
 
 <!-- MODAL: SIMULAR APORTE -->
-<div class="modal" *ngIf="showAporteModal">
+<div class="modal" appModal *ngIf="showAporteModal">
   <div class="modal-content modal-aporte">
     <h2>Simular Aporte</h2>
 
     <form [formGroup]="aporteForm">
       <mat-form-field appearance="outline">
         <mat-label>Valor do aporte (R$)</mat-label>
-        <input matInput type="number" formControlName="valorAporte" min="0.01" />
+        <input matInput type="number" inputmode="decimal" step="any" formControlName="valorAporte" min="0.01" autocomplete="off" />
       </mat-form-field>
     </form>
 
@@ -243,7 +243,7 @@
 </div>
 
 <!-- MODAL: DELETAR CATEGORIA -->
-<div class="modal" *ngIf="showDeleteCategoriaModal">
+<div class="modal" appModal *ngIf="showDeleteCategoriaModal">
   <div class="modal-content">
     <h2>Remover Categoria</h2>
     <p>Tem certeza que deseja remover a categoria <strong>{{ categoriaToDelete?.name }}</strong>?</p>
@@ -255,7 +255,7 @@
 </div>
 
 <!-- MODAL: DELETAR ATIVO -->
-<div class="modal" *ngIf="showDeleteInvestimentoModal">
+<div class="modal" appModal *ngIf="showDeleteInvestimentoModal">
   <div class="modal-content">
     <h2>Remover Ativo</h2>
     <p>Tem certeza que deseja remover o ativo <strong>{{ investimentoToDelete?.name }}</strong>?</p>

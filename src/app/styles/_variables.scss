@@ -17,8 +17,15 @@ $blue-500: #0065C1;
 $orange-500: #C95E00;
 
 $text-dark: #1F2937;
-$text-light: #6B7280;
-$text-muted: #718EBF;
+$text-light: #4B5563;
+// Contraste AA: #718EBF (3.3:1) -> #52678F (5.7:1 sobre branco, 4.9:1 sobre lavanda)
+$text-muted: #52678F;
+$border-soft: #E4DAF3;
+$danger: #B20000;
+$danger-light: #FDECEC;
+$focus-ring: rgba(157, 78, 221, 0.55);
+$overlay: rgba(31, 20, 56, 0.55);
+$touch-target: 44px;
 
 // Breakpoints
 $mobile-sm: 360px;
@@ -56,6 +63,7 @@ $shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
 
 // Transitions
 $ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+$ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
 // ========================================
 // MIXINS - Responsive
