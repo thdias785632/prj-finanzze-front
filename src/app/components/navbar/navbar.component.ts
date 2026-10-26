@@ -15,13 +15,27 @@ import { Router, RouterModule } from '@angular/router';
 })
 export class NavbarComponent implements OnInit {
   userMenuOpen: boolean = false;
+  userName = '';
+  userEmail = '';
 
   constructor(
     private router: Router
   ) {}
 
   ngOnInit(): void {
-    // Navbar não precisa mais das rotas (movidas para bottom-nav)
+    try {
+      const raw = localStorage.getItem('@Finnanze:User');
+      const user = raw ? JSON.parse(raw) : null;
+
+      this.userName = user?.name || '';
+      this.userEmail = user?.email || '';
+    } catch {
+      // sem usuário válido no storage: mantém o avatar genérico
+    }
+  }
+
+  get initial(): string {
+    return (this.userName || 'U').trim().charAt(0).toUpperCase();
   }
 
   /**

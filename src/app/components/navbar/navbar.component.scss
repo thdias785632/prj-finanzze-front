@@ -1,101 +1,72 @@
 @use '../../styles/variables' as *;
 
-$navbar-h: 56px;
-
 .navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
-  color: $white;
-  padding: 0;
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  height: $navbar-h;
+  height: $navbar-height;
+  box-sizing: border-box;
+  padding: 0 $spacing-md;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+  color: $white;
   z-index: 1000;
-  box-shadow: 
-    0 4px 16px rgba(0, 0, 0, 0.3),
-    0 0 24px rgba($accent, 0.2);
-  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 12px rgba(31, 20, 56, 0.18);
+
+  @include tablet { padding: 0 $spacing-xl; }
 
   .brand {
     display: flex;
     align-items: center;
-    gap: $spacing-sm;
-    margin: 0 $spacing-md;
+    gap: 10px;
 
-    @include tablet {
-      margin: 0 $spacing-xl;
+    .brand-mark {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: rgba($white, 0.16);
+
+      mat-icon { font-size: 20px; width: 20px; height: 20px; color: $white; }
     }
 
     .brand-text {
-      font-size: 18px;
-      font-weight: 900;
-      font-family: 'Asap', sans-serif;
-      letter-spacing: 2px;
-      background: $white;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      text-shadow: 0 2px 8px rgba($accent-bright, 0.3);
-      
-      @include tablet {
-        font-size: 20px;
-      }
-
-      @include desktop {
-        font-size: 22px;
-        letter-spacing: 3px;
-      }
-    }
-  }
-
-  .header {
-    font-size: 16px;
-    font-weight: 700;
-    text-align: center;
-    font-family: 'Asap', sans-serif;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    flex-grow: 1;
-    
-    @include tablet {
-      font-size: 18px;
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: $white;
     }
   }
 
   .user-icon {
     position: relative;
-    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: $touch-target;
+    height: $touch-target;
     border-radius: 50%;
-    background: rgba($white, 0.15);
-    transition: all 0.3s ease;
-    margin: 0 $spacing-md;
+    cursor: pointer;
+    transition: background-color 0.2s $ease-smooth;
 
-    @include tablet {
-      margin: 0 $spacing-xl;
-    }
+    &:hover { background: rgba($white, 0.12); }
 
-    &:hover {
-      background: rgba($white, 0.25);
-      transform: scale(1.05);
-    }
-
-    &:active {
-      transform: scale(0.95);
-    }
-
-    mat-icon {
-      color: $white;
-      font-size: 24px;
-      width: 24px;
-      height: 24px;
+    .avatar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: $white;
+      color: $primary-dark;
+      font-size: 16px;
+      font-weight: 700;
     }
 
     .dropdown-menu {
@@ -103,67 +74,52 @@ $navbar-h: 56px;
       position: absolute;
       right: 0;
       top: calc(100% + 8px);
-      min-width: 180px;
-      background: rgba($white, 0.98);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba($primary, 0.1);
+      min-width: 220px;
+      padding: $spacing-sm;
+      background: $white;
+      border: 1px solid $border-soft;
       border-radius: $radius-lg;
       box-shadow: $shadow-lg;
-      padding: $spacing-sm;
       z-index: 1001;
-      animation: dropdownSlideIn 0.3s $ease-smooth;
+      animation: dropdownSlideIn 0.2s $ease-out;
 
-      &.open {
-        display: block;
+      &.open { display: block; }
+
+      .dropdown-user {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        padding: $spacing-sm $spacing-md $spacing-md;
+        margin-bottom: $spacing-xs;
+        border-bottom: 1px solid $border-soft;
+        cursor: default;
+
+        strong { color: $text-dark; font-size: 15px; font-weight: 600; }
+        span { color: $text-muted; font-size: 13px; overflow-wrap: anywhere; }
       }
 
       .dropdown-item {
         display: flex;
         align-items: center;
         gap: $spacing-sm;
-        padding: $spacing-sm $spacing-md;
+        min-height: $touch-target;
+        padding: 0 $spacing-md;
         color: $text-dark;
         text-decoration: none;
         cursor: pointer;
         border-radius: $radius-md;
-        font-family: 'Asap', sans-serif;
-        font-weight: 600;
         font-size: 14px;
-        transition: all 0.2s ease;
+        font-weight: 500;
+        transition: background-color 0.2s;
 
-        mat-icon {
-          color: $primary;
-          font-size: 20px;
-          width: 20px;
-          height: 20px;
-          transition: all 0.2s ease;
-        }
+        mat-icon { color: $primary; font-size: 20px; width: 20px; height: 20px; }
 
-        &:hover {
-          background: rgba($primary, 0.08);
-          transform: translateX(4px);
-
-          mat-icon {
-            color: $accent;
-          }
-        }
-
-        &:active {
-          transform: translateX(2px) scale(0.98);
-        }
+        &:hover { background: $primary-light; }
 
         &.logout {
-          color: #EF4444;
-          border-top: 1px solid rgba($primary, 0.1);
-          margin-top: 4px;
-
-          mat-icon {
-            color: #EF4444;
-          }
-
-          &:hover {
-            background: rgba(#EF4444, 0.08);
-          }
+          color: $danger;
+          mat-icon { color: $danger; }
+          &:hover { background: $danger-light; }
         }
       }
     }
@@ -171,12 +127,6 @@ $navbar-h: 56px;
 }
 
 @keyframes dropdownSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
 }

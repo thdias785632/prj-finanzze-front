@@ -5,18 +5,23 @@
 <div class="container main-content">
     <section>
         <div class="new-itens">
-            <button (click)="showCreateCardModal = true">Novo Cartão</button>
+            <button type="button" class="btn-primary" (click)="showCreateCardModal = true"><mat-icon aria-hidden="true">add</mat-icon> Novo cartão</button>
         </div>
 
         <div class="extract" *ngIf="cardsExtract.length > 0">
             <div class="extract-item" *ngFor="let cardExtract of cardsExtract">
-                <div class="header">
-                    <div>
-                        <h2>Fatura mês atual</h2>
-                        <p>R$ {{ cardExtract.total | number: '1.2-2' }}</p>
+                <div class="credit-card__visual">
+                    <div class="cc-top">
+                        <span class="cc-chip" aria-hidden="true"></span>
+                        <span class="cc-flag" *ngIf="cardExtract.card.flag">{{ cardExtract.card.flag }}</span>
                     </div>
 
-                    <h2>{{ cardExtract.card.name | titlecase }}</h2>
+                    <div class="cc-body">
+                        <span class="cc-label">Fatura mês atual</span>
+                        <span class="cc-value">R$ {{ cardExtract.total | number: '1.2-2' }}</span>
+                    </div>
+
+                    <span class="cc-name">{{ cardExtract.card.name | titlecase }}</span>
                 </div>
 
                 <div class="extract-table">
@@ -47,7 +52,7 @@
         </div>
 
         <div class="no-card-found" *ngIf="cardsExtract.length === 0">
-            <mat-icon class="no-data-icon">credit_card</mat-icon>
+            <mat-icon class="no-data-icon" aria-hidden="true">credit_card</mat-icon>
             <h2>Nenhum cartão cadastrado.</h2>
         </div>
     </section>

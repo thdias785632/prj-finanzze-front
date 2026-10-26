@@ -1,24 +1,17 @@
-<!-- BOTTOM NAVIGATION - MOBILE FIRST -->
+<!-- Navegação inferior: barra branca limpa, aba ativa com "pílula" roxa -->
 <nav class="bottom-navigation" aria-label="Navegação principal">
-  <a 
+  <a
     *ngFor="let route of routes"
     [routerLink]="route.path"
     routerLinkActive="active"
     ariaCurrentWhenActive="page"
     [routerLinkActiveOptions]="{exact: route.exact || false}"
-    class="nav-item"
     [attr.aria-label]="route.label"
-    >
-    
-    <!-- Ícone -->
-    <div class="icon-wrapper">
-      <mat-icon>{{ route.icon }}</mat-icon>
-    </div>
-    
-    <!-- Label -->
+    class="nav-item"
+  >
+    <span class="icon-wrapper">
+      <mat-icon aria-hidden="true">{{ route.icon }}</mat-icon>
+    </span>
     <span class="label">{{ route.label }}</span>
-    
-    <!-- Ripple effect background -->
-    <div class="ripple"></div>
   </a>
 </nav>

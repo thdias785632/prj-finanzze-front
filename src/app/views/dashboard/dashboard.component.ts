@@ -45,6 +45,14 @@ export class DashboardComponent implements OnInit {
     cardsExtract: CardsExtract[] = [];
     categoriesGrouped!: {[key: string]: number};
 
+    get balance(): number {
+        return this.userExtract ? this.userExtract.totalRevenues - this.userExtract.totalExpensess : 0;
+    }
+
+    get firstName(): string {
+        return (this.user?.name || '').trim().split(' ')[0];
+    }
+
     constructor(
         private userService: UserGateway,
         private cardService: CardGateway,

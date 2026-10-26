@@ -1,7 +1,7 @@
 @use '../../styles/variables' as *;
 
 .container {
-  background-color: $primary-light;
+  background-color: $app-bg;
   min-height: 100vh;
   margin: 0;
   padding: $spacing-md $spacing-md $spacing-2xl;
@@ -68,7 +68,7 @@ h1 {
   color: $primary;
   font-size: 24px;
   margin: 0;
-  font-family: 'Asap', sans-serif;
+  font-family: $font-base;
   font-weight: 400;
 
   @include tablet {
@@ -81,7 +81,7 @@ h2 {
   font-size: 16px;
   margin: 0;
   font-weight: 500;
-  font-family: 'Asap', sans-serif;
+  font-family: $font-base;
 }
 
 h3 {
@@ -89,7 +89,7 @@ h3 {
   font-size: 12px;
   margin: 0;
   font-weight: 500;
-  font-family: 'Asap', sans-serif;
+  font-family: $font-base;
 }
 
 .extract {
@@ -125,7 +125,8 @@ h3 {
   padding: $spacing-md;
   border-radius: $radius-xl;
   background-color: $white;
-  box-shadow: $shadow-md;
+  box-shadow: $shadow-card;
+  border: 1px solid $border-soft;
   transition: box-shadow 0.2s $ease-smooth;
 
   @include tablet {
