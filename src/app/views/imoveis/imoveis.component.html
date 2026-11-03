@@ -1,0 +1,166 @@
+<app-notification></app-notification>
+<app-loader [isLoading]="isLoading"></app-loader>
+
+<div class="container main-content">
+  <section>
+    <div class="page-head">
+      <div>
+        <h1>Imóveis</h1>
+        <p class="subtitle">Fluxo de pagamento, parcelas e correção pelo INCC</p>
+      </div>
+      <button type="button" class="btn-primary" (click)="openModal()"><mat-icon aria-hidden="true">add</mat-icon> Novo imóvel</button>
+    </div>
+
+    <!-- Resumo geral -->
+    <div class="hero" *ngIf="imoveis.length > 0">
+      <span class="hero-caption">Saldo a pagar (corrigido)</span>
+      <p class="hero-balance amount">R$ {{ totalRemaining | number: '1.2-2' }}</p>
+
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-icon in" aria-hidden="true"><mat-icon>check</mat-icon></span>
+          <div class="stat-text"><span class="stat-label">Já pago</span><span class="stat-value amount">R$ {{ totalPaid | number: '1.2-2' }}</span></div>
+        </div>
+        <div class="stat">
+          <span class="stat-icon out" aria-hidden="true"><mat-icon>schedule</mat-icon></span>
+          <div class="stat-text"><span class="stat-label">{{ overdueCount > 0 ? 'Parcelas atrasadas' : 'Em dia' }}</span><span class="stat-value amount">{{ overdueCount }}</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="imoveis.length === 0 && !isLoading">
+      <mat-icon aria-hidden="true">apartment</mat-icon>
+      <h2>Nenhum imóvel cadastrado</h2>
+      <p>Cadastre seu contrato com o fluxo de pagamento (entrada, mensais, intermediárias, chaves e financiamento) e acompanhe as parcelas já corrigidas pelo INCC.</p>
+      <button type="button" class="btn-primary" (click)="openModal()">Cadastrar imóvel</button>
+    </div>
+
+    <div class="section-head" *ngIf="imoveis.length > 0"><h2>Meus imóveis</h2></div>
+
+    <div class="imoveis-grid">
+      <a class="imovel-card" *ngFor="let imovel of imoveis" [routerLink]="['/imoveis', imovel.id]" [attr.aria-label]="'Abrir ' + imovel.name">
+        <div class="imovel-top">
+          <span class="imovel-icon" aria-hidden="true"><mat-icon>apartment</mat-icon></span>
+          <div class="imovel-title">
+            <h3>{{ imovel.name }}</h3>
+            <span *ngIf="imovel.developer">{{ imovel.developer }}</span>
+          </div>
+          <span class="badge danger" *ngIf="imovel.overdueCount > 0">{{ imovel.overdueCount }} atrasada(s)</span>
+        </div>
+
+        <div class="progress" role="progressbar" [attr.aria-valuenow]="imovel.progressPercentage" aria-valuemin="0" aria-valuemax="100" [attr.aria-label]="'Pago: ' + imovel.progressPercentage + '%'">
+          <span [style.width.%]="imovel.progressPercentage"></span>
+        </div>
+
+        <div class="imovel-values">
+          <div><span class="label">Pago</span><span class="value amount">R$ {{ imovel.totalPaid | number: '1.2-2' }}</span></div>
+          <div class="right"><span class="label">Restante</span><span class="value amount">R$ {{ imovel.totalRemaining | number: '1.2-2' }}</span></div>
+        </div>
+
+        <div class="imovel-meta">
+          <span *ngIf="imovel.nextInstallment">
+            <mat-icon aria-hidden="true">event</mat-icon>
+            Próxima: {{ imovel.nextInstallment.dueDate | date: 'dd/MM/yyyy' }} · R$ {{ imovel.nextInstallment.currentAmount | number: '1.2-2' }}
+          </span>
+          <span *ngIf="imovel.financingStartDate">
+            <mat-icon aria-hidden="true">account_balance</mat-icon>
+            Financiamento a partir de {{ imovel.financingStartDate | date: 'dd/MM/yyyy' }}<ng-container *ngIf="imovel.financingAmount > 0"> · R$ {{ imovel.financingAmount | number: '1.2-2' }}</ng-container>
+          </span>
+        </div>
+      </a>
+    </div>
+  </section>
+</div>
+
+<!-- MODAL: NOVO IMÓVEL -->
+<div class="modal" appModal *ngIf="showModal">
+  <div class="modal-content modal-imovel">
+    <div class="modal-header">
+      <h2>{{ step === 1 ? 'Novo imóvel' : 'Fluxo de pagamento' }}</h2>
+      <button type="button" class="icon-btn" data-modal-close aria-label="Fechar" (click)="closeModal()"><mat-icon aria-hidden="true">close</mat-icon></button>
+    </div>
+    <p class="step-label">Etapa {{ step }} de 2</p>
+
+    <form [formGroup]="form" (ngSubmit)="step === 1 ? next() : save()">
+      <!-- ETAPA 1 -->
+      <div *ngIf="step === 1">
+        <mat-form-field appearance="outline">
+          <mat-label>Nome do imóvel</mat-label>
+          <input matInput formControlName="name" placeholder="Ex: Apto 1201" autocomplete="off" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Construtora (opcional)</mat-label>
+          <input matInput formControlName="developer" autocomplete="off" />
+        </mat-form-field>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Valor do contrato (R$)</mat-label>
+            <input matInput type="number" inputmode="decimal" step="any" min="0" formControlName="totalValue" autocomplete="off" />
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Data do contrato</mat-label>
+            <input matInput type="date" formControlName="contractDate" />
+          </mat-form-field>
+        </div>
+
+        <h3 class="group-title">Correção pelo INCC</h3>
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Mês-base do contrato</mat-label>
+            <input matInput type="month" formControlName="inccBaseMonth" (input)="baseMonthTouched = true" />
+            <mat-hint>Mês do índice usado como base</mat-hint>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Defasagem do índice</mat-label>
+            <mat-select formControlName="inccLagMonths">
+              <mat-option *ngFor="let n of lagOptions" [value]="n">{{ n === 0 ? 'Mesmo mês' : n + (n === 1 ? ' mês antes' : ' meses antes') }}</mat-option>
+            </mat-select>
+            <mat-hint>{{ lagExample() }}</mat-hint>
+          </mat-form-field>
+        </div>
+
+        <h3 class="group-title">Datas importantes (opcional)</h3>
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Entrega das chaves</mat-label>
+            <input matInput type="date" formControlName="deliveryDate" />
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Início do financiamento</mat-label>
+            <input matInput type="date" formControlName="financingStartDate" />
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- ETAPA 2 -->
+      <div *ngIf="step === 2" formArrayName="fluxos">
+        <p class="modal-text">Adicione cada grupo de pagamento do contrato. Cada grupo gera as parcelas automaticamente.</p>
+
+        <div class="fluxo-card" *ngFor="let group of fluxoGroups; let i = index">
+          <div class="fluxo-card-head">
+            <strong>Fluxo {{ i + 1 }}</strong>
+            <button type="button" class="icon-btn danger" [attr.aria-label]="'Remover fluxo ' + (i + 1)" (click)="removeFluxo(i)"><mat-icon aria-hidden="true">delete</mat-icon></button>
+          </div>
+          <app-fluxo-fields [group]="group"></app-fluxo-fields>
+        </div>
+
+        <div class="quick-add">
+          <span>Adicionar:</span>
+          <button type="button" class="chip" *ngFor="let t of quickTypes" (click)="addFluxo(t.value)">+ {{ t.label }}</button>
+        </div>
+
+        <p class="planned" [class.warn]="form.value.totalValue && plannedTotal !== form.value.totalValue">
+          Soma dos fluxos: <strong>R$ {{ plannedTotal | number: '1.2-2' }}</strong>
+          <span *ngIf="form.value.totalValue"> · Contrato: R$ {{ form.value.totalValue | number: '1.2-2' }}</span>
+        </p>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="cancel" (click)="step === 1 ? closeModal() : step = 1">{{ step === 1 ? 'Cancelar' : 'Voltar' }}</button>
+        <button type="submit" [disabled]="saving">{{ step === 1 ? 'Próximo' : (saving ? 'Salvando...' : 'Salvar imóvel') }}</button>
+      </div>
+    </form>
+  </div>
+</div>

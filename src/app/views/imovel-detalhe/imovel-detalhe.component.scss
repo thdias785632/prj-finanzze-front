@@ -1,0 +1,121 @@
+@use '../../styles/variables' as *;
+
+.container {
+  background-color: $app-bg;
+  min-height: 100vh;
+  margin: 0;
+  padding: $spacing-md $spacing-md 160px;
+
+  @include tablet { padding: $spacing-lg $spacing-xl 160px; }
+
+  section {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    @include content-container;
+    @include content-container-wide;
+  }
+}
+
+.page-head {
+  margin-bottom: 0;
+  gap: $spacing-xs;
+
+  .head-title { flex: 1; min-width: 0; h1 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 22px; } }
+  .back-link { display: inline-flex; align-items: center; justify-content: center; width: $touch-target; height: $touch-target; border-radius: $radius-lg; color: $primary-dark; &:hover { background: $primary-light; } }
+}
+
+.hero { cursor: default; }
+
+.chips { display: flex; flex-wrap: wrap; gap: $spacing-xs; }
+
+.card {
+  padding: 20px;
+  border-radius: $radius-xl;
+  background: $white;
+  border: 1px solid $border-soft;
+  box-shadow: $shadow-card;
+
+  .section-head { margin-bottom: $spacing-sm; }
+  mat-form-field { width: 100%; }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.section-head { margin: $spacing-sm 0 0; }
+
+.link-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: $touch-target;
+  padding: 0 $spacing-sm;
+  border: none;
+  border-radius: $radius-md;
+  background: transparent;
+  color: $primary;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+
+  mat-icon { width: 20px; height: 20px; font-size: 20px; }
+  &:hover { background: $primary-light; }
+  &.danger { color: $danger; &:hover { background: $danger-light; } }
+}
+
+.fluxo {
+  overflow: hidden;
+  border-radius: $radius-xl;
+  background: $white;
+  border: 1px solid $border-soft;
+  box-shadow: $shadow-card;
+
+  .fluxo-head {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    width: 100%;
+    padding: 16px 20px;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    color: $text-dark;
+
+    .fluxo-title { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; strong { font-size: 16px; } span { color: $text-muted; font-size: 13px; } }
+    .fluxo-total { display: flex; flex-direction: column; align-items: flex-end; .amount { font-size: 15px; } small { color: $text-muted; font-size: 12px; } }
+    mat-icon { color: $primary; }
+  }
+
+  .parcelas { padding: 0 20px 12px; border-top: 1px solid $border-soft; }
+
+  .parcela {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-md;
+    padding: 12px 0;
+    border-bottom: 1px solid $border-soft;
+
+    &.paid .value { color: #1B6B2B; }
+    &.overdue { .parcela-info strong { color: $danger; } }
+
+    .parcela-info { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; min-width: 0; strong { width: 100%; font-size: 14px; } .detail { color: $text-muted; font-size: 12px; } }
+    .parcela-action { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex: 0 0 auto; .value { font-size: 15px; } }
+  }
+
+  .pay-btn, .undo-btn {
+    min-height: 36px;
+    padding: 0 $spacing-md;
+    border: none;
+    border-radius: $radius-md;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .pay-btn { background: $primary; color: $white; &:hover { background: $primary-dark; } }
+  .undo-btn { background: $primary-light; color: $primary-dark; }
+
+  .fluxo-footer { display: flex; justify-content: space-between; padding-top: $spacing-xs; }
+}

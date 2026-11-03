@@ -1,0 +1,192 @@
+<app-notification></app-notification>
+<app-loader [isLoading]="isLoading"></app-loader>
+
+<div class="container main-content">
+  <section *ngIf="imovel as i">
+    <div class="page-head">
+      <a class="back-link" routerLink="/imoveis" aria-label="Voltar para Imóveis"><mat-icon aria-hidden="true">arrow_back</mat-icon></a>
+      <div class="head-title">
+        <h1>{{ i.name }}</h1>
+        <p class="subtitle"><ng-container *ngIf="i.developer">{{ i.developer }} · </ng-container>Contrato de {{ i.contractDate | date: 'dd/MM/yyyy' }}</p>
+      </div>
+      <button type="button" class="icon-btn" aria-label="Editar imóvel" (click)="openEdit()"><mat-icon aria-hidden="true">edit</mat-icon></button>
+      <button type="button" class="icon-btn danger" aria-label="Remover imóvel" (click)="showDeleteModal = true"><mat-icon aria-hidden="true">delete</mat-icon></button>
+    </div>
+
+    <!-- Resumo -->
+    <div class="hero">
+      <div class="hero-top">
+        <span class="hero-greeting">{{ i.paidInstallments }} de {{ i.totalInstallments }} parcelas pagas</span>
+        <span class="hero-month">{{ i.progressPercentage | number: '1.0-1' }}%</span>
+      </div>
+      <span class="hero-caption">Saldo a pagar (corrigido pelo INCC)</span>
+      <p class="hero-balance amount">R$ {{ i.totalRemaining | number: '1.2-2' }}</p>
+
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-icon in" aria-hidden="true"><mat-icon>check</mat-icon></span>
+          <div class="stat-text"><span class="stat-label">Já pago</span><span class="stat-value amount">R$ {{ i.totalPaid | number: '1.2-2' }}</span></div>
+        </div>
+        <div class="stat">
+          <span class="stat-icon out" aria-hidden="true"><mat-icon>account_balance</mat-icon></span>
+          <div class="stat-text"><span class="stat-label">A financiar</span><span class="stat-value amount">R$ {{ i.financingAmount | number: '1.2-2' }}</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chips">
+      <span class="badge danger" *ngIf="i.overdueCount > 0">{{ i.overdueCount }} parcela(s) atrasada(s)</span>
+      <span class="badge" *ngIf="i.deliveryDate">Chaves: {{ i.deliveryDate | date: 'dd/MM/yyyy' }}</span>
+      <span class="badge" *ngIf="i.financingStartDate">Financiamento: {{ i.financingStartDate | date: 'dd/MM/yyyy' }}</span>
+      <span class="badge" *ngIf="i.lastIndexMonth">Último INCC: {{ i.lastIndexMonth + '-01' | date: 'MMM/yyyy' }}</span>
+    </div>
+
+    <!-- Correção INCC -->
+    <div class="card incc-card">
+      <div class="section-head"><h2>Correção pelo INCC</h2></div>
+      <form [formGroup]="inccForm" (ngSubmit)="saveIncc()">
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Referência do índice</mat-label>
+            <mat-select formControlName="inccLagMonths">
+              <mat-option *ngFor="let n of lagOptions" [value]="n">{{ n === 0 ? 'Mesmo mês do vencimento' : n + (n === 1 ? ' mês antes do vencimento' : ' meses antes do vencimento') }}</mat-option>
+            </mat-select>
+            <mat-hint>{{ lagPreview() }}</mat-hint>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Mês-base do contrato</mat-label>
+            <input matInput type="month" formControlName="inccBaseMonth" />
+          </mat-form-field>
+        </div>
+        <button type="submit" class="btn-primary" [disabled]="inccForm.pristine || inccForm.invalid">Salvar correção</button>
+      </form>
+    </div>
+
+    <!-- Fluxos -->
+    <div class="section-head">
+      <h2>Fluxo de pagamento</h2>
+      <button type="button" class="link-btn" (click)="openFluxoModal()"><mat-icon aria-hidden="true">add</mat-icon> Fluxo</button>
+    </div>
+
+    <div class="fluxo" *ngFor="let f of detalhe!.fluxos">
+      <button type="button" class="fluxo-head" [attr.aria-expanded]="!!expanded[f.id]?.open" (click)="toggle(f)">
+        <div class="fluxo-title">
+          <strong>{{ f.description }}</strong>
+          <span>{{ f.paidCount }}/{{ f.parcelas.length }} pagas · {{ f.indexType === 'INCC' ? 'corrigido pelo INCC' : 'valor fixo' }}</span>
+        </div>
+        <div class="fluxo-total">
+          <span class="amount">R$ {{ f.totalRemaining | number: '1.2-2' }}</span>
+          <small>restante</small>
+        </div>
+        <mat-icon aria-hidden="true">{{ expanded[f.id]?.open ? 'expand_less' : 'expand_more' }}</mat-icon>
+      </button>
+
+      <div class="parcelas" *ngIf="expanded[f.id]?.open">
+        <div class="parcela" *ngFor="let p of visibleParcelas(f)" [class.paid]="p.paid" [class.overdue]="p.overdue">
+          <div class="parcela-info">
+            <strong>{{ p.number }}/{{ p.totalNumbers }} · {{ p.dueDate | date: 'dd/MM/yyyy' }}</strong>
+            <span class="detail" *ngIf="!p.paid && p.indexType === 'INCC'">
+              Base R$ {{ p.baseAmount | number: '1.2-2' }} · INCC de {{ p.referenceMonth + '-01' | date: 'MMM/yyyy' }} ({{ (p.correctionFactor - 1) * 100 | number: '1.2-2' }}%)
+            </span>
+            <span class="detail" *ngIf="p.paid">Pago em {{ p.paidAt | date: 'dd/MM/yyyy' }}</span>
+            <span class="badge danger" *ngIf="p.overdue">Atrasada</span>
+            <span class="badge warn" *ngIf="p.estimated">Estimado: INCC ainda não divulgado</span>
+          </div>
+          <div class="parcela-action">
+            <span class="amount value">R$ {{ p.currentAmount | number: '1.2-2' }}</span>
+            <button type="button" class="pay-btn" *ngIf="!p.paid" (click)="openPay(p)">Pagar</button>
+            <button type="button" class="undo-btn" *ngIf="p.paid" (click)="undo(p)">Desfazer</button>
+          </div>
+        </div>
+
+        <div class="fluxo-footer">
+          <button type="button" class="link-btn" *ngIf="f.parcelas.length > 6" (click)="toggleAll(f)">{{ expanded[f.id]?.all ? 'Mostrar menos' : 'Ver todas as ' + f.parcelas.length + ' parcelas' }}</button>
+          <button type="button" class="link-btn danger" (click)="fluxoToDelete = f">Remover fluxo</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- MODAL: PAGAR PARCELA -->
+<div class="modal" appModal *ngIf="showPayModal && parcelaToPay">
+  <div class="modal-content">
+    <h2>Registrar pagamento</h2>
+    <p class="modal-text">{{ parcelaToPay.fluxoDescription }} · parcela {{ parcelaToPay.number }}/{{ parcelaToPay.totalNumbers }} · vence em {{ parcelaToPay.dueDate | date: 'dd/MM/yyyy' }}</p>
+    <form [formGroup]="payForm">
+      <mat-form-field appearance="outline">
+        <mat-label>Valor pago (R$)</mat-label>
+        <input matInput type="number" inputmode="decimal" step="any" min="0" formControlName="paidAmount" autocomplete="off" />
+        <mat-hint>Sugerido: valor corrigido pelo INCC</mat-hint>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Data do pagamento</mat-label>
+        <input matInput type="date" formControlName="paidAt" />
+      </mat-form-field>
+    </form>
+    <div class="modal-actions">
+      <button type="button" class="cancel" (click)="showPayModal = false">Cancelar</button>
+      <button type="button" [disabled]="saving || payForm.invalid" (click)="confirmPay()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: NOVO FLUXO -->
+<div class="modal" appModal *ngIf="showFluxoModal">
+  <div class="modal-content">
+    <h2>Novo fluxo de pagamento</h2>
+    <form [formGroup]="fluxoForm">
+      <app-fluxo-fields [group]="fluxoForm"></app-fluxo-fields>
+    </form>
+    <div class="modal-actions">
+      <button type="button" class="cancel" (click)="showFluxoModal = false">Cancelar</button>
+      <button type="button" [disabled]="saving" (click)="saveFluxo()">Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: EDITAR IMÓVEL -->
+<div class="modal" appModal *ngIf="showEditModal">
+  <div class="modal-content">
+    <h2>Editar imóvel</h2>
+    <form [formGroup]="editForm">
+      <mat-form-field appearance="outline"><mat-label>Nome</mat-label><input matInput formControlName="name" autocomplete="off" /></mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>Construtora</mat-label><input matInput formControlName="developer" autocomplete="off" /></mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>Endereço</mat-label><input matInput formControlName="address" autocomplete="off" /></mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>Valor do contrato (R$)</mat-label><input matInput type="number" inputmode="decimal" step="any" min="0" formControlName="totalValue" autocomplete="off" /></mat-form-field>
+      <div class="form-row">
+        <mat-form-field appearance="outline"><mat-label>Entrega das chaves</mat-label><input matInput type="date" formControlName="deliveryDate" /></mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>Início do financiamento</mat-label><input matInput type="date" formControlName="financingStartDate" /></mat-form-field>
+      </div>
+      <mat-form-field appearance="outline"><mat-label>Observações</mat-label><textarea matInput rows="2" formControlName="notes"></textarea></mat-form-field>
+    </form>
+    <div class="modal-actions">
+      <button type="button" class="cancel" (click)="showEditModal = false">Cancelar</button>
+      <button type="button" [disabled]="editForm.invalid" (click)="saveEdit()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: REMOVER FLUXO -->
+<div class="modal" appModal *ngIf="fluxoToDelete">
+  <div class="modal-content">
+    <h2>Remover {{ fluxoToDelete.description }}?</h2>
+    <p class="modal-text">As {{ fluxoToDelete.parcelas.length }} parcelas deste fluxo serão excluídas. Essa ação não pode ser desfeita.</p>
+    <div class="modal-actions">
+      <button type="button" class="cancel" (click)="fluxoToDelete = undefined">Cancelar</button>
+      <button type="button" class="danger" (click)="confirmDeleteFluxo()">Remover</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: REMOVER IMÓVEL -->
+<div class="modal" appModal *ngIf="showDeleteModal && imovel">
+  <div class="modal-content">
+    <h2>Remover {{ imovel.name }}?</h2>
+    <p class="modal-text">O imóvel, os fluxos e todas as parcelas (inclusive as pagas) serão excluídos. Essa ação não pode ser desfeita.</p>
+    <div class="modal-actions">
+      <button type="button" class="cancel" (click)="showDeleteModal = false">Cancelar</button>
+      <button type="button" class="danger" (click)="confirmDeleteImovel()">Remover</button>
+    </div>
+  </div>
+</div>
