@@ -45,9 +45,9 @@ export class BottomNavComponent implements OnInit {
       exact: false
     },
     {
-      path: '/investimento',
-      label: 'Investimentos',
-      icon: 'trending_up',
+      path: '/imoveis',
+      label: 'Imóveis',
+      icon: 'apartment',
       exact: false
     }
   ];

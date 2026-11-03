@@ -1,0 +1,135 @@
+@use '../../styles/variables' as *;
+
+.container {
+  background-color: $app-bg;
+  min-height: 100vh;
+  margin: 0;
+  padding: $spacing-md $spacing-md 160px;
+
+  @include tablet { padding: $spacing-lg $spacing-xl 160px; }
+
+  section {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+    @include content-container;
+    @include content-container-wide;
+  }
+}
+
+.hero { cursor: default; }
+
+.imoveis-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-md;
+
+  @include tablet { grid-template-columns: 1fr 1fr; }
+}
+
+.section-head { margin: 0; }
+
+.imovel-card {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  padding: 20px;
+  border-radius: $radius-xl;
+  background: $white;
+  border: 1px solid $border-soft;
+  box-shadow: $shadow-card;
+  color: inherit;
+  text-decoration: none;
+  transition: transform 0.2s $ease-smooth, box-shadow 0.2s $ease-smooth;
+
+  @include desktop { &:hover { transform: translateY(-2px); box-shadow: $shadow-md; } }
+
+  .imovel-top { display: flex; align-items: center; gap: $spacing-sm; }
+
+  .imovel-icon {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: $primary-light;
+    color: $primary;
+  }
+
+  .imovel-title {
+    flex: 1;
+    min-width: 0;
+    h3 { margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: $text-dark; font-size: 17px; font-weight: 700; }
+    span { color: $text-muted; font-size: 13px; }
+  }
+
+  .imovel-values {
+    display: flex;
+    justify-content: space-between;
+    gap: $spacing-md;
+
+    .label { display: block; color: $text-muted; font-size: 12px; font-weight: 500; }
+    .value { font-size: 17px; color: $text-dark; }
+    .right { text-align: right; }
+  }
+
+  .imovel-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-top: $spacing-sm;
+    border-top: 1px solid $border-soft;
+    color: $text-muted;
+    font-size: 13px;
+
+    span { display: flex; align-items: center; gap: 6px; }
+    mat-icon { flex: 0 0 auto; width: 18px; height: 18px; font-size: 18px; color: $primary; }
+  }
+}
+
+// ---- modal de cadastro ----
+.modal-imovel { max-width: 560px; }
+
+.fluxo-card {
+  margin-bottom: $spacing-md;
+  padding: $spacing-md;
+  border: 1px solid $border-soft;
+  border-radius: $radius-lg;
+  background: #FBF9FE;
+
+  .fluxo-card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: $spacing-sm; color: $primary-dark; }
+}
+
+.quick-add {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $spacing-xs;
+  margin-bottom: $spacing-md;
+  color: $text-muted;
+  font-size: 13px;
+
+  .chip {
+    min-height: 36px;
+    padding: 0 $spacing-md;
+    border: 1px solid #C9B8E3;
+    border-radius: 999px;
+    background: $white;
+    color: $primary-dark;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    &:hover { background: $primary-light; }
+  }
+}
+
+.planned {
+  margin: 0;
+  color: $text-muted;
+  font-size: 14px;
+  strong { color: $primary-dark; }
+  &.warn { color: #8A5A00; }
+}
