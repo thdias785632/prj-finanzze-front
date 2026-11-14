@@ -91,7 +91,7 @@
             <span class="detail" *ngIf="p.paid">Pago em {{ p.paidAt | date: 'dd/MM/yyyy' }}</span>
             <span class="badge danger" *ngIf="p.overdue">Atrasada</span>
             <span class="badge warn" *ngIf="p.estimated && p.projectedMonths">
-              Estimado: {{ p.projectedMonths }} {{ p.projectedMonths === 1 ? 'mês' : 'meses' }} pela média de {{ p.projectedYear }} ({{ p.projectedVariation | number: '1.2-2' }}%/mês)
+              Estimado: {{ p.projectedMonths }} {{ p.projectedMonths === 1 ? 'mês' : 'meses' }} - ({{ p.projectedVariation | number: '1.2-2' }}%/mês)
             </span>
             <span class="badge warn" *ngIf="p.estimated && !p.projectedMonths">Estimado: INCC ainda não divulgado</span>
           </div>
