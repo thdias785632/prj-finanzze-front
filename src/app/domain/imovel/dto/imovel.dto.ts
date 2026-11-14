@@ -19,6 +19,9 @@ export interface Parcela {
     correctionFactor: number;
     correctedAmount: number;
     estimated: boolean;
+    projectedMonths?: number;       // meses do período projetados pela média do INCC do ano
+    projectedVariation?: number;    // média mensal (%) usada na projeção
+    projectedYear?: number;         // ano da média
     currentAmount: number;
     overdue: boolean;
 }

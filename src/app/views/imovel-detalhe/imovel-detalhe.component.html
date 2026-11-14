@@ -53,7 +53,7 @@
             </mat-select>
             <mat-hint>{{ lagPreview() }}</mat-hint>
           </mat-form-field>
-          <mat-form-field appearance="outline">
+          <mat-form-field appearance="outline" class="pt-2">
             <mat-label>Mês-base do contrato</mat-label>
             <input matInput type="month" formControlName="inccBaseMonth" />
           </mat-form-field>
@@ -86,11 +86,14 @@
           <div class="parcela-info">
             <strong>{{ p.number }}/{{ p.totalNumbers }} · {{ p.dueDate | date: 'dd/MM/yyyy' }}</strong>
             <span class="detail" *ngIf="!p.paid && p.indexType === 'INCC'">
-              Base R$ {{ p.baseAmount | number: '1.2-2' }} · INCC de {{ p.referenceMonth + '-01' | date: 'MMM/yyyy' }} ({{ (p.correctionFactor - 1) * 100 | number: '1.2-2' }}%)
+              Base R$ {{ p.baseAmount | number: '1.2-2' }} · Acumulado de {{ i.inccBaseMonth | date: 'MMM/yyyy' }} a {{ p.referenceMonth + '-01' | date: 'MMM/yyyy' }}: {{ (p.correctionFactor - 1) * 100 | number: '1.2-2' }}%
             </span>
             <span class="detail" *ngIf="p.paid">Pago em {{ p.paidAt | date: 'dd/MM/yyyy' }}</span>
             <span class="badge danger" *ngIf="p.overdue">Atrasada</span>
-            <span class="badge warn" *ngIf="p.estimated">Estimado: INCC ainda não divulgado</span>
+            <span class="badge warn" *ngIf="p.estimated && p.projectedMonths">
+              Estimado: {{ p.projectedMonths }} {{ p.projectedMonths === 1 ? 'mês' : 'meses' }} pela média de {{ p.projectedYear }} ({{ p.projectedVariation | number: '1.2-2' }}%/mês)
+            </span>
+            <span class="badge warn" *ngIf="p.estimated && !p.projectedMonths">Estimado: INCC ainda não divulgado</span>
           </div>
           <div class="parcela-action">
             <span class="amount value">R$ {{ p.currentAmount | number: '1.2-2' }}</span>
