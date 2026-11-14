@@ -1,3 +1,4 @@
+import { CategoryDetails, buildCategoryDetails } from '../../utils/category-details';
 import { Component, OnInit } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -44,6 +45,7 @@ export class DashboardComponent implements OnInit {
     referenceDate: Date = new Date();
     cardsExtract: CardsExtract[] = [];
     categoriesGrouped!: {[key: string]: number};
+    categoryDetails: CategoryDetails = {};
 
     get balance(): number {
         return this.userExtract ? this.userExtract.totalRevenues - this.userExtract.totalExpensess : 0;
@@ -132,6 +134,8 @@ export class DashboardComponent implements OnInit {
         this.categoriesGrouped = Object.fromEntries(
             Object.entries(categoryMap).sort(([, a], [, b]) => b - a)
         );
+
+        this.categoryDetails = buildCategoryDetails(this.userExtract);
 
         if (Object.keys(this.categoriesGrouped).length === 0) {
             this.categoriesGrouped = { 'Sem categorias': 1 }

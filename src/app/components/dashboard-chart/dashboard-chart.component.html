@@ -1,3 +1,100 @@
-<div class="chart-wrapper">
-  <canvas #doughnutCanvas></canvas>
+<div class="donut-chart" *ngIf="segments.length > 0">
+  <!-- Gráfico -->
+  <div class="donut-wrap">
+    <svg class="donut" [class.has-focus]="!!focusName" viewBox="0 0 240 240" aria-hidden="true" focusable="false" (mouseleave)="hovered = null">
+      <circle class="track" cx="120" cy="120" r="81"></circle>
+
+      <g
+        class="seg"
+        *ngFor="let s of segments; let i = index; trackBy: trackByName"
+        [class.active]="s.name === selected"
+        [class.hover]="s.name === hovered"
+        [style.--i]="i"
+        [style.--ux]="s.ux"
+        [style.--uy]="s.uy"
+      >
+        <circle
+          class="arc"
+          cx="120" cy="120" r="81"
+          pathLength="100"
+          transform="rotate(-90 120 120)"
+          [attr.stroke]="s.color"
+          [attr.stroke-dasharray]="s.dash + ' ' + (100 - s.dash)"
+          [attr.stroke-dashoffset]="-s.start"
+          (mouseenter)="hovered = s.name"
+          (click)="select(s.name)"
+        ></circle>
+      </g>
+    </svg>
+
+    <div class="center" aria-hidden="true">
+      <ng-container *ngIf="centerSegment as c; else totalCenter">
+        <span class="center-label">{{ c.name }}</span>
+        <strong class="center-value amount">R$ {{ c.value | number: '1.2-2' }}</strong>
+        <span class="center-pct">{{ c.percent | number: '1.1-1' }}%</span>
+      </ng-container>
+      <ng-template #totalCenter>
+        <span class="center-label">Renda</span>
+        <strong class="center-value amount">R$ {{ total | number: '1.2-2' }}</strong>
+        <span class="center-pct">Toque numa fatia</span>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- Lista abaixo do gráfico; o detalhe da categoria sobrepõe só esta área -->
+  <div class="list-stack">
+    <ul class="legend" [class.covered]="!!selected">
+      <li *ngFor="let s of segments; trackBy: trackByName">
+        <button
+          #rowBtn
+          type="button"
+          class="legend-row"
+          [class.hover]="s.name === hovered"
+          [attr.aria-label]="s.name + ', R$ ' + (s.value | number: '1.2-2') + ', ' + (s.percent | number: '1.0-1') + '% do total. Ver lançamentos'"
+          [attr.tabindex]="selected ? -1 : 0"
+          (click)="select(s.name)"
+          (mouseenter)="hovered = s.name"
+          (mouseleave)="hovered = null"
+        >
+          <span class="dot" [style.background]="s.color" aria-hidden="true"></span>
+          <span class="name">{{ s.name }}</span>
+          <span class="pct">{{ s.percent | number: '1.1-1' }}%</span>
+          <span class="value amount">R$ {{ s.value | number: '1.2-2' }}</span>
+          <mat-icon aria-hidden="true">chevron_right</mat-icon>
+        </button>
+      </li>
+    </ul>
+
+    <section class="detail" *ngIf="selectedSegment as sel" role="region" [attr.aria-label]="'Lançamentos de ' + sel.name" (keydown.escape)="close()">
+      <header class="detail-head">
+        <span class="dot big" [style.background]="sel.color" aria-hidden="true"></span>
+        <div class="detail-title">
+          <h3>{{ sel.name }}</h3>
+          <span>R$ {{ sel.value | number: '1.2-2' }} · {{ sel.percent | number: '1.1-1' }}% do total</span>
+        </div>
+        <button #closeBtn type="button" class="icon-btn" aria-label="Fechar e voltar para a lista" (click)="close()">
+          <mat-icon aria-hidden="true">close</mat-icon>
+        </button>
+      </header>
+
+      <ul class="detail-items" *ngIf="selectedItems.length > 0; else noItems">
+        <li *ngFor="let item of selectedItems" [class.inactive]="item.inactive">
+          <div class="item-info">
+            <strong>{{ item.name }}</strong>
+            <span class="meta">
+              <span class="tag">{{ item.kind }}</span>
+              <ng-container *ngIf="item.date">{{ item.date | date: 'dd/MM/yyyy' }}</ng-container>
+              <ng-container *ngIf="item.installments && item.installments > 1"> · {{ item.installments }}x</ng-container>
+              <ng-container *ngIf="item.inactive"> · inativa</ng-container>
+            </span>
+          </div>
+          <span class="amount item-value" [class.negative]="item.value < 0">{{ item.value < 0 ? '−' : '' }}R$ {{ (item.value < 0 ? -item.value : item.value) | number: '1.2-2' }}</span>
+        </li>
+      </ul>
+
+      <ng-template #noItems>
+        <p class="empty">Sem lançamentos detalhados para esta categoria.</p>
+      </ng-template>
+    </section>
+  </div>
 </div>
