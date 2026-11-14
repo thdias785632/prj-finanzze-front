@@ -179,7 +179,7 @@
       .tag { padding: 1px 8px; border-radius: 999px; background: $primary-light; color: $primary-dark; font-size: 11px; font-weight: 600; }
     }
 
-    .item-value { flex: 0 0 auto; font-size: 15px; color: $text-dark; &.negative { color: $danger; } }
+    .item-value { flex: 0 0 auto; font-size: 15px; padding-right: 4px; color: $text-dark; &.negative { color: $danger; } }
   }
 
   .empty { margin: $spacing-md 0 0; color: $text-muted; font-size: 14px; }

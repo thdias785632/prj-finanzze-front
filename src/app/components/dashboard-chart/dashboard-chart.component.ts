@@ -14,19 +14,11 @@ interface Segment {
   uy: number;
 }
 
-// Paleta com cores bem distintas (a antiga repetia rosa ao passar de 10 categorias)
 const PALETTE = [
   '#6639A6', '#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0', '#FF9F40',
   '#9D4EDD', '#8DD3C7', '#B3DE69', '#FDB462', '#C9CBCF', '#2E7D8F',
 ];
 
-/**
- * Donut de categorias em SVG com animação:
- *  - entrada: cada fatia "desenha" o arco em sequência;
- *  - ociosa: cada fatia respira (afasta/aproxima do centro) com fases defasadas;
- *  - interação: passar o mouse destaca, clicar abre o detalhe da categoria sobre a lista.
- * A lista fica abaixo do gráfico e é também o caminho acessível por teclado/leitor de tela.
- */
 @Component({
   selector: 'app-dashboard-chart',
   standalone: true,
