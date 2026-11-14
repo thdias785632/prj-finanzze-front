@@ -1,14 +1,191 @@
 @use '../../styles/variables' as *;
 
-.chart-wrapper {
+.donut-chart {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+// ---------- gráfico ----------
+.donut-wrap {
+  position: relative;
   width: 100%;
-  height: 300px;
+  max-width: 300px;
+  margin: 0 auto;
+  aspect-ratio: 1;
 
-  @include tablet {
-    height: 350px;
+  @include tablet { max-width: 340px; }
+}
+
+.donut {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+
+  .track { fill: none; stroke: $primary-light; stroke-width: 36; }
+
+  .seg {
+    // "respiração": cada fatia afasta/aproxima do centro, com fases defasadas
+    animation: breathe 4.2s ease-in-out infinite;
+    animation-delay: calc(var(--i) * -0.55s);
+    transition: opacity 0.25s $ease-smooth;
   }
 
-  @include desktop {
-    height: 400px;
+  .arc {
+    fill: none;
+    stroke-width: 36;
+    cursor: pointer;
+    // desenha o arco na entrada, em sequência
+    animation: draw 1s $ease-out both;
+    animation-delay: calc(var(--i) * 70ms);
+    transition: stroke-dasharray 0.6s $ease-out, stroke-dashoffset 0.6s $ease-out, stroke-width 0.2s $ease-smooth;
   }
+
+  .seg.hover .arc { stroke-width: 42; }
+
+  // destaque: fatia escolhida sai do anel e as demais esmaecem
+  .seg.active {
+    animation: none;
+    transform: translate(calc(var(--ux) * 9px), calc(var(--uy) * 9px));
+    transition: transform 0.3s $ease-out;
+    .arc { stroke-width: 42; }
+  }
+
+  &.has-focus .seg:not(.active):not(.hover) { opacity: 0.4; animation-play-state: paused; }
+}
+
+@keyframes draw { from { stroke-dasharray: 0 100; } }
+
+@keyframes breathe {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(calc(var(--ux) * 4px), calc(var(--uy) * 4px)); }
+}
+
+.center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 22%;
+  text-align: center;
+  pointer-events: none;
+
+  .center-label { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: $text-muted; font-size: 13px; font-weight: 600; }
+  .center-value { color: $text-dark; font-size: 20px; font-weight: 700; letter-spacing: -0.02em; @include tablet { font-size: 22px; } }
+  .center-pct { color: $primary; font-size: 13px; font-weight: 600; }
+}
+
+// ---------- lista + detalhe (mesma célula: o detalhe cobre a lista) ----------
+.list-stack {
+  display: grid;
+  > * { grid-area: 1 / 1; }
+}
+
+.legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  transition: opacity 0.2s $ease-smooth;
+
+  &.covered { visibility: hidden; opacity: 0; pointer-events: none; }
+
+  li { border-bottom: 1px solid $border-soft; &:last-child { border-bottom: none; } }
+}
+
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 $spacing-xs;
+  border: none;
+  border-radius: $radius-md;
+  background: transparent;
+  color: $text-dark;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s $ease-smooth;
+
+  &:hover, &.hover { background: $primary-light; }
+
+  .name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; font-weight: 500; }
+  .pct { color: $text-muted; font-size: 13px; }
+  .value { min-width: 84px; text-align: right; font-size: 15px; }
+  mat-icon { flex: 0 0 auto; width: 20px; height: 20px; font-size: 20px; color: $text-muted; }
+}
+
+.dot {
+  flex: 0 0 auto;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  &.big { width: 16px; height: 16px; }
+}
+
+.detail {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: $white;
+  animation: detail-in 0.3s $ease-out;
+
+  .detail-head {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    padding-bottom: $spacing-sm;
+    border-bottom: 1px solid $border-soft;
+
+    .detail-title {
+      flex: 1;
+      min-width: 0;
+      h3 { margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: $primary-dark; font-size: 18px; font-weight: 700; }
+      span { color: $text-muted; font-size: 13px; }
+    }
+  }
+
+  .detail-items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 420px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+
+    li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: $spacing-md;
+      min-height: 56px;
+      padding: $spacing-xs 0;
+      border-bottom: 1px solid $border-soft;
+      &:last-child { border-bottom: none; }
+      &.inactive { opacity: 0.6; }
+    }
+
+    .item-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+      strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; font-weight: 500; color: $text-dark; }
+      .meta { display: flex; align-items: center; gap: 6px; color: $text-muted; font-size: 12px; }
+      .tag { padding: 1px 8px; border-radius: 999px; background: $primary-light; color: $primary-dark; font-size: 11px; font-weight: 600; }
+    }
+
+    .item-value { flex: 0 0 auto; font-size: 15px; color: $text-dark; &.negative { color: $danger; } }
+  }
+
+  .empty { margin: $spacing-md 0 0; color: $text-muted; font-size: 14px; }
+}
+
+@keyframes detail-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
 }

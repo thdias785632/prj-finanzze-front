@@ -1,3 +1,4 @@
+import { CategoryDetails, buildCategoryDetails } from '../../utils/category-details';
 import { ModalDirective } from '../../directives/modal.directive';
 import { Component, Input, OnInit } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -85,6 +86,7 @@ export class ExtractComponent implements OnInit {
   expenssesToDelete: Itens | undefined = undefined;
   
   categoriesGrouped!: {[key: string]: number};
+  categoryDetails: CategoryDetails = {};
   
   cardExpenssesToDelete: Itens | undefined;
   
@@ -217,6 +219,14 @@ export class ExtractComponent implements OnInit {
         this.categoriesGrouped = Object.fromEntries(
             Object.entries(categoryMap).sort(([, a], [, b]) => b - a)
         );
+
+        this.categoryDetails = buildCategoryDetails(this.userExtract);
+
+        // "Economia" não é um gasto: é a sobra do mês (entradas - saídas)
+        this.categoryDetails['Economia'] = [
+          { name: 'Entradas do mês', value: this.userExtract.totalRevenues, kind: 'Entrada' },
+          { name: 'Saídas do mês', value: -this.userExtract.totalExpensess, kind: 'Saída' },
+        ];
   }
 
   hasInactiveItems(ItensToSearch: 'expensses' | 'revenues' | 'carsExpensses'): boolean {
