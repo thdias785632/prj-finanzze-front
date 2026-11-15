@@ -22,10 +22,13 @@ export class AppComponent implements OnInit {
   constructor(private router: Router) {}
   
   ngOnInit(): void {
-    // Esconde bottom-nav em rotas públicas
+    // Esconde navbar/bottom-nav em rotas públicas (inclui o primeiro load)
+    const publicRoutes = ['/'];
+
+    this.showNav = !publicRoutes.includes(this.router.url);
+
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
-        const publicRoutes = ['/'];
         this.showNav = !publicRoutes.includes(event.url);
       }
     });

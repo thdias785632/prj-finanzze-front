@@ -1,0 +1,214 @@
+@use '../../styles/variables' as *;
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.belt {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-md;
+  width: 100%;
+  padding: $spacing-md 0;
+  overflow: hidden;
+
+  &::before {
+    content: ' ';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.09) 1px, transparent 1px);
+    background-size: 22px 22px;
+    mask-image: radial-gradient(ellipse at center, #000 30%, transparent 78%);
+    -webkit-mask-image: radial-gradient(ellipse at center, #000 30%, transparent 78%);
+    pointer-events: none;
+  }
+
+  &__stage {
+    position: relative;
+    width: 100%;
+    height: 320px;
+    perspective: 1600px;
+    perspective-origin: 50% 50%;
+
+    @include tablet {
+      height: 400px;
+    }
+  }
+
+  &__card {
+    --card-w: 150px;
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: var(--card-w);
+    padding: 8px;
+    border-radius: 16px;
+    background: #F4F1F9;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5);
+    transform-style: preserve-3d;
+    transition:
+      transform 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+      filter 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+
+    @include tablet {
+      --card-w: 190px;
+    }
+
+    &-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 6px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid rgba(31, 20, 56, 0.1);
+    }
+  }
+
+  &__code {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    color: rgba(31, 20, 56, 0.45);
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__label {
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+  }
+
+  &__shot {
+    width: 100%;
+    overflow: hidden;
+    border-radius: 10px;
+    background: #fff;
+
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+      object-position: top;
+    }
+  }
+
+  &__phase-indicator {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    gap: 6px;
+  }
+
+  &__phase-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.22);
+    transition: all 0.4s $ease-smooth;
+
+    &.is-active {
+      width: 18px;
+      border-radius: 3px;
+      background: $accent-bright;
+    }
+  }
+}
+
+// ============================================
+// FASE 1 — CÍRCULO
+// ============================================
+.belt[data-phase='circle'] .belt__card {
+  transform:
+    translate(-50%, -50%)
+    rotateY(calc(var(--ring-angle) * 1deg))
+    translateZ(240px)
+    rotateY(calc(var(--ring-angle) * -1deg))
+    scale(0.72);
+
+  opacity: 0.85;
+  filter: none;
+}
+
+// ============================================
+// FASE 2 — DESTAQUE
+// ============================================
+.belt[data-phase='focus'] .belt__card {
+  transform:
+    translate(-50%, -50%)
+    translateX(calc(var(--belt-offset) * 90px))
+    translateZ(calc(var(--belt-offset) * -120px))
+    scale(0.6);
+
+  opacity: 0.25;
+  filter: blur(3px) saturate(0.7);
+}
+
+.belt[data-phase='focus'] .belt__card.is-focus {
+  transform:
+    translate(-50%, -50%)
+    translateZ(60px)
+    scale(1.18);
+
+  opacity: 1;
+  filter: none;
+  z-index: 10;
+  outline: 3px solid var(--accent);
+  outline-offset: 6px;
+}
+
+.belt[data-phase='focus'] .belt__card.is-dimmed {
+  pointer-events: none;
+}
+
+// ============================================
+// FASE 3 — DIAGONAL
+// ============================================
+.belt[data-phase='diagonal'] .belt__card {
+  transform:
+    translate(-50%, -50%)
+    translate(var(--diag-x), var(--diag-y))
+    rotate(-8deg)
+    scale(0.78);
+
+  opacity: 0.9;
+  filter: none;
+}
+
+// ============================================
+// FASE 4 — BELT HORIZONTAL
+// ============================================
+.belt[data-phase='belt'] .belt__card {
+  transform:
+    translate(-50%, -50%)
+    translateX(calc(var(--belt-offset) * 130px))
+    translateZ(calc(var(--belt-offset) * -100px))
+    rotateY(calc(var(--belt-offset) * -14deg))
+    scale(calc(1 - var(--belt-offset) * var(--belt-offset) * 0.1));
+
+  opacity: 0.55;
+  filter: blur(1.2px) saturate(0.85);
+}
+
+.belt[data-phase='belt'] .belt__card[style*='--belt-offset: 0'] {
+  opacity: 1;
+  filter: none;
+  z-index: 10;
+  outline: 3px solid var(--accent);
+  outline-offset: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .belt__card {
+    transition-duration: 0.01ms;
+  }
+}
