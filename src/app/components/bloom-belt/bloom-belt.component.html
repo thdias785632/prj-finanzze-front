@@ -1,0 +1,40 @@
+<section
+  class="belt"
+  [attr.data-phase]="phase"
+  (mouseenter)="onEnter()"
+  (mouseleave)="onLeave()"
+  aria-roledescription="carrossel"
+  aria-label="Telas do Finanzze">
+
+  <div class="belt__stage">
+    <article
+      *ngFor="let card of cards; let i = index"
+      class="belt__card"
+      [class.is-focus]="phase === 'focus' && i === focusIndex"
+      [class.is-dimmed]="phase === 'focus' && i !== focusIndex"
+      [style.--ring-angle]="ringAngle(i)"
+      [style.--diag-x]="diagonalOffset(i).x + 'px'"
+      [style.--diag-y]="diagonalOffset(i).y + 'px'"
+      [style.--belt-offset]="beltOffset(i)"
+      [style.--accent]="card.accent"
+      [attr.aria-hidden]="phase === 'focus' && i !== focusIndex">
+
+      <header class="belt__card-head">
+        <span class="belt__code">{{ card.code }}</span>
+        <span class="belt__label">{{ card.label }}</span>
+      </header>
+
+      <div class="belt__shot">
+        <img [src]="card.image" [alt]="card.label" loading="lazy" draggable="false">
+      </div>
+    </article>
+  </div>
+
+  <div class="belt__phase-indicator" aria-hidden="true">
+    <span
+      *ngFor="let p of ['circle', 'focus', 'diagonal', 'belt']"
+      class="belt__phase-dot"
+      [class.is-active]="phase === p">
+    </span>
+  </div>
+</section>
