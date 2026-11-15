@@ -48,12 +48,8 @@ export class BloomBeltComponent implements OnInit, OnDestroy {
     return this.activeIndex;
   }
 
-  /**
-   * Posição relativa do card em relação ao centro do anel (-2..+2).
-   * Usada para calcular ângulo e profundidade na fase círculo.
-   */
   ringAngle(index: number): number {
-    return (index / this.cards.length) * 360;
+    return (index / this.cards.length) * 360 - 90;
   }
 
   /** Deslocamento diagonal na fase diagonal. */
