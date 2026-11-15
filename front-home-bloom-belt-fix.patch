@@ -1,0 +1,104 @@
+From 10d442249841e9be5442d18acbbbad73184b9a07 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Sun, 15 Nov 2026 19:21:00 +0000
+Subject: [PATCH] =?UTF-8?q?fix(home):=20imagens=20do=20bloom-belt=20n?=
+ =?UTF-8?q?=C3=A3o=20eram=20publicadas=20no=20build?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+- angular.json: a edição de assets tinha ido para o target de testes (karma), não para o build; o build só copia 'public/', então src/assets nunca chegava ao navegador (404)
+- imagens movidas para public/assets/belt (padrão do projeto, sem mexer no angular.json) e angular.json restaurado
+- caminhos passam de '../../assets/belt/...' (relativo à página) para 'assets/belt/...' (relativo ao base href)
+- imagens do hero carregam com loading=eager (lazy atrasava cards fora da viewport durante a animação)
+---
+ angular.json                                        |   7 +++----
+ {src => public}/assets/belt/imagem-a.png            | Bin
+ {src => public}/assets/belt/imagem-b.png            | Bin
+ {src => public}/assets/belt/imagem-c.png            | Bin
+ {src => public}/assets/belt/imagem-d.png            | Bin
+ {src => public}/assets/belt/imagem-e.png            | Bin
+ .../components/bloom-belt/bloom-belt.component.html |   2 +-
+ src/app/components/bloom-belt/bloom-belt.data.ts    |  10 +++++-----
+ 8 files changed, 9 insertions(+), 10 deletions(-)
+ rename {src => public}/assets/belt/imagem-a.png (100%)
+ rename {src => public}/assets/belt/imagem-b.png (100%)
+ rename {src => public}/assets/belt/imagem-c.png (100%)
+ rename {src => public}/assets/belt/imagem-d.png (100%)
+ rename {src => public}/assets/belt/imagem-e.png (100%)
+
+diff --git a/angular.json b/angular.json
+index 4e4395f..f2c9112 100644
+--- a/angular.json
++++ b/angular.json
+@@ -92,10 +92,9 @@
+             "tsConfig": "tsconfig.spec.json",
+             "inlineStyleLanguage": "scss",
+             "assets": [
+-              { 
+-                "glob": "**/*", 
+-                "input": "src/assets", 
+-                "output": "assets" 
++              {
++                "glob": "**/*",
++                "input": "public"
+               }
+             ],
+             "styles": [
+diff --git a/src/assets/belt/imagem-a.png b/public/assets/belt/imagem-a.png
+similarity index 100%
+rename from src/assets/belt/imagem-a.png
+rename to public/assets/belt/imagem-a.png
+diff --git a/src/assets/belt/imagem-b.png b/public/assets/belt/imagem-b.png
+similarity index 100%
+rename from src/assets/belt/imagem-b.png
+rename to public/assets/belt/imagem-b.png
+diff --git a/src/assets/belt/imagem-c.png b/public/assets/belt/imagem-c.png
+similarity index 100%
+rename from src/assets/belt/imagem-c.png
+rename to public/assets/belt/imagem-c.png
+diff --git a/src/assets/belt/imagem-d.png b/public/assets/belt/imagem-d.png
+similarity index 100%
+rename from src/assets/belt/imagem-d.png
+rename to public/assets/belt/imagem-d.png
+diff --git a/src/assets/belt/imagem-e.png b/public/assets/belt/imagem-e.png
+similarity index 100%
+rename from src/assets/belt/imagem-e.png
+rename to public/assets/belt/imagem-e.png
+diff --git a/src/app/components/bloom-belt/bloom-belt.component.html b/src/app/components/bloom-belt/bloom-belt.component.html
+index 06b803f..2d8f198 100644
+--- a/src/app/components/bloom-belt/bloom-belt.component.html
++++ b/src/app/components/bloom-belt/bloom-belt.component.html
+@@ -25,7 +25,7 @@
+       </header>
+ 
+       <div class="belt__shot">
+-        <img [src]="card.image" [alt]="card.label" loading="lazy" draggable="false">
++        <img [src]="card.image" [alt]="card.label" loading="eager" decoding="async" draggable="false">
+       </div>
+     </article>
+   </div>
+diff --git a/src/app/components/bloom-belt/bloom-belt.data.ts b/src/app/components/bloom-belt/bloom-belt.data.ts
+index f28fce0..1ed62ac 100644
+--- a/src/app/components/bloom-belt/bloom-belt.data.ts
++++ b/src/app/components/bloom-belt/bloom-belt.data.ts
+@@ -9,11 +9,11 @@ export interface BeltCard {
+ }
+ 
+ export const BELT_CARDS: BeltCard[] = [
+-  { id: 'a', code: '0034', label: 'RESUMO',     image: '../../assets/belt/imagem-a.png', accent: '#7A45BF' },
+-  { id: 'b', code: '0095', label: 'EXTRATO',    image: '../../assets/belt/imagem-b.png', accent: '#4A1F7A' },
+-  { id: 'c', code: '0316', label: 'GRÁFICO',    image: '../../assets/belt/imagem-c.png', accent: '#9D4EDD' },
+-  { id: 'd', code: '2026', label: 'CATEGORIAS', image: '../../assets/belt/imagem-d.png', accent: '#5E4B8B' },
+-  { id: 'e', code: '0084', label: 'GASTOS',     image: '../../assets/belt/imagem-e.png', accent: '#6639A6' }
++  { id: 'a', code: '0034', label: 'RESUMO',     image: 'assets/belt/imagem-a.png', accent: '#7A45BF' },
++  { id: 'b', code: '0095', label: 'EXTRATO',    image: 'assets/belt/imagem-b.png', accent: '#4A1F7A' },
++  { id: 'c', code: '0316', label: 'GRÁFICO',    image: 'assets/belt/imagem-c.png', accent: '#9D4EDD' },
++  { id: 'd', code: '2026', label: 'CATEGORIAS', image: 'assets/belt/imagem-d.png', accent: '#5E4B8B' },
++  { id: 'e', code: '0084', label: 'GASTOS',     image: 'assets/belt/imagem-e.png', accent: '#6639A6' }
+ ];
+ 
+ export const PHASE_DURATION = {
+-- 
+2.43.0
+
