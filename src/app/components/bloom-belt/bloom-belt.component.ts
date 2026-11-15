@@ -1,9 +1,18 @@
 import {
-  ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  Input,
+  OnDestroy,
+  OnInit
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
-  BELT_CARDS, BeltCard, BeltPhase, PHASE_DURATION, PHASE_ORDER
+  BELT_CARDS,
+  BeltCard,
+  BeltPhase,
+  PHASE_DURATION,
+  PHASE_ORDER
 } from './bloom-belt.data';
 
 @Component({
@@ -23,6 +32,8 @@ export class BloomBeltComponent implements OnInit, OnDestroy {
   activeIndex = 0;
   private phaseTimer?: ReturnType<typeof setTimeout>;
   private paused = false;
+
+  constructor(private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.scheduleNextPhase();
@@ -88,6 +99,10 @@ export class BloomBeltComponent implements OnInit, OnDestroy {
     if (this.phase === 'belt') {
       this.activeIndex = (this.activeIndex + 1) % this.cards.length;
     }
+
+    // setTimeout está fora do ciclo do Angular e o componente é OnPush:
+    // sem isso, a nova fase nunca chega ao template
+    this.cdr.markForCheck();
 
     this.scheduleNextPhase();
   }
