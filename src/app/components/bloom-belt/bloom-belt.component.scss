@@ -127,16 +127,42 @@
 // ============================================
 // FASE 1 — CÍRCULO
 // ============================================
+.belt[data-phase='circle'] .belt__stage {
+  perspective: 1200px;
+  perspective-origin: 50% 45%;
+}
+
 .belt[data-phase='circle'] .belt__card {
+  // raio do anel: menor no mobile para caber na tela
+  --ring-radius: 118px;
+
   transform:
     translate(-50%, -50%)
-    rotateY(calc(var(--ring-angle) * 1deg))
-    translateZ(240px)
-    rotateY(calc(var(--ring-angle) * -1deg))
-    scale(0.72);
+    rotateX(18deg)
+    rotate(calc(var(--ring-angle) * 1deg))
+    translateY(calc(var(--ring-radius) * -1))
+    rotate(calc(var(--ring-angle) * -1deg))
+    scale(0.62);
 
-  opacity: 0.85;
+  opacity: 0.9;
   filter: none;
+
+  @include tablet {
+    --ring-radius: 168px;
+    scale: 0.7;
+  }
+}
+
+@keyframes ring-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.belt[data-phase='circle'] .belt__stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
 
 // ============================================
